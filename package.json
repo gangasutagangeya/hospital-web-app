@@ -1,8 +1,6 @@
 {
-  "name": "hospital-web-app",
+  "name": "hospital-web-app-82ef",
   "private": true,
-  "license": "MIT",
-  "author": "Kent C. Dodds <me@kentcdodds.com> (https://kentcdodds.com/)",
   "sideEffects": false,
   "type": "module",
   "imports": {
