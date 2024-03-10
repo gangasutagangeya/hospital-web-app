@@ -81,7 +81,7 @@ export const links: LinksFunction = () => {
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	return [
-		{ title: data ? 'Epic Notes' : 'Error | Epic Notes' },
+		{ title: data ? 'HMS' : 'Error | HMS' },
 		{ name: 'description', content: `Your own captain's log` },
 	]
 }
@@ -228,9 +228,9 @@ function App() {
 				<header className="container py-6">
 					<nav className="flex flex-wrap items-center justify-between gap-4 sm:flex-nowrap md:gap-8">
 						<Logo />
-						<div className="ml-auto hidden max-w-sm flex-1 sm:block">
+						{/* <div className="ml-auto hidden max-w-sm flex-1 sm:block">
 							{searchBar}
-						</div>
+						</div> */}
 						<div className="flex items-center gap-10">
 							{user ? (
 								<UserDropdown />
@@ -263,10 +263,7 @@ function Logo() {
 	return (
 		<Link to="/" className="group grid leading-snug">
 			<span className="font-light transition group-hover:-translate-x-1">
-				epic
-			</span>
-			<span className="font-bold transition group-hover:translate-x-1">
-				notes
+				Ga-Ga HMS
 			</span>
 		</Link>
 	)
@@ -317,13 +314,13 @@ function UserDropdown() {
 							</Icon>
 						</Link>
 					</DropdownMenuItem>
-					<DropdownMenuItem asChild>
+					{/* <DropdownMenuItem asChild>
 						<Link prefetch="intent" to={`/users/${user.username}/notes`}>
 							<Icon className="text-body-md" name="pencil-2">
 								Notes
 							</Icon>
 						</Link>
-					</DropdownMenuItem>
+					</DropdownMenuItem> */}
 					<DropdownMenuItem
 						asChild
 						// this prevents the menu from closing before the form submission is completed
