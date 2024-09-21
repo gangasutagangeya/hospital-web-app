@@ -287,3 +287,16 @@ export async function downloadFile(url: string, retries: number = 0) {
 		return downloadFile(url, retries + 1)
 	}
 }
+
+export function getDefaultFromToDates(bufferDays: number = 30): {
+	fromDate: string
+	toDate: string
+} {
+	const fromDate = new Date(
+		new Date().setDate(new Date().getDate() - bufferDays),
+	)
+		.toISOString()
+		.split('T')[0]
+	const toDate = new Date().toISOString().split('T')[0]
+	return { fromDate, toDate }
+}

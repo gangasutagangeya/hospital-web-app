@@ -1,8 +1,9 @@
 import { createCookieSessionStorage } from '@remix-run/node'
+// TODO: Look into sessions being set
 
 export const authSessionStorage = createCookieSessionStorage({
 	cookie: {
-		name: 'en_session',
+		name: 'gaga_hms_session',
 		sameSite: 'lax', // CSRF protection is advised if changing to 'none'
 		path: '/',
 		httpOnly: true,

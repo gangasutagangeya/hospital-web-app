@@ -18,6 +18,10 @@ export const NameSchema = z
 	.string({ required_error: 'Name is required' })
 	.min(3, { message: 'Name is too short' })
 	.max(40, { message: 'Name is too long' })
+export const FatherNameSchema = z
+	.string({ required_error: 'Father Name is required' })
+	.min(3, { message: 'Name is too short' })
+	.max(40, { message: 'Name is too long' })
 export const EmailSchema = z
 	.string({ required_error: 'Email is required' })
 	.email({ message: 'Email is invalid' })
@@ -37,3 +41,37 @@ export const PasswordAndConfirmPasswordSchema = z
 			})
 		}
 	})
+
+export const DataOfBithSchema = z.date({
+	required_error: 'Date of Birth is required',
+})
+export const GenderSchema = z
+	.string({
+		required_error: 'Gender is required',
+	})
+	.length(1)
+export const AadharSchema = z
+	.string({
+		required_error: 'Aadhar is required',
+	})
+	.length(12)
+export const AddressSchema = z
+	.object({
+		town: z.string({
+			required_error: 'Town is required',
+		}),
+		district: z.string({
+			required_error: 'District is required',
+		}),
+	})
+	.required()
+export const MobileSchema = z
+	.string({
+		required_error: 'Mobile is required',
+	})
+	.length(10)
+export const BloodGroupSchema = z
+	.string({
+		required_error: 'Blood Group is required',
+	})
+	.max(3)

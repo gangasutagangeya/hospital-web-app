@@ -1,4 +1,4 @@
-import { type Connection, type Password, type User } from '@prisma/client'
+import { type Connection, type Password, type Users } from '@prisma/client'
 import { redirect } from '@remix-run/node'
 import bcrypt from 'bcryptjs'
 import { Authenticator } from 'remix-auth'
@@ -74,16 +74,17 @@ export async function login({
 	username,
 	password,
 }: {
-	username: User['username']
+	username: Users['email' | 'phone']
 	password: string
 }) {
 	const user = await verifyUserPassword({ username }, password)
 	if (!user) return null
 	const session = await prisma.session.create({
-		select: { id: true, expirationDate: true, userId: true },
+		select: { id: true, expirationDate: true, userId: true, hospitalId: true },
 		data: {
 			expirationDate: getSessionExpirationDate(),
 			userId: user.id,
+			hospitalId: user.hospitalId ?? '',
 		},
 	})
 	return session
@@ -93,7 +94,7 @@ export async function resetUserPassword({
 	username,
 	password,
 }: {
-	username: User['username']
+	username: Users['username']
 	password: string
 }) {
 	const hashedPassword = await getPasswordHash(password)
@@ -115,9 +116,9 @@ export async function signup({
 	password,
 	name,
 }: {
-	email: User['email']
-	username: User['username']
-	name: User['name']
+	email: Users['email']
+	username: Users['username']
+	name: Users['name']
 	password: string
 }) {
 	const hashedPassword = await getPasswordHash(password)
@@ -144,7 +145,7 @@ export async function signup({
 
 	return session
 }
-
+// TODO: Fix singup with connection creation
 export async function signupWithConnection({
 	email,
 	username,
@@ -153,9 +154,9 @@ export async function signupWithConnection({
 	providerName,
 	imageUrl,
 }: {
-	email: User['email']
-	username: User['username']
-	name: User['name']
+	email: Users['email']
+	username: Users['username']
+	name: Users['name']
 	providerId: Connection['providerId']
 	providerName: Connection['providerName']
 	imageUrl?: string
@@ -169,10 +170,6 @@ export async function signupWithConnection({
 					username: username.toLowerCase(),
 					name,
 					roles: { connect: { name: 'user' } },
-					connections: { create: { providerId, providerName } },
-					image: imageUrl
-						? { create: await downloadFile(imageUrl) }
-						: undefined,
 				},
 			},
 		},
@@ -218,12 +215,16 @@ export async function getPasswordHash(password: string) {
 }
 
 export async function verifyUserPassword(
-	where: Pick<User, 'username'> | Pick<User, 'id'>,
+	where: Pick<Users, 'username'> | Pick<Users, 'id'>,
 	password: Password['hash'],
 ) {
 	const userWithPassword = await prisma.user.findUnique({
 		where,
-		select: { id: true, password: { select: { hash: true } } },
+		select: {
+			id: true,
+			hospitalId: true,
+			password: { select: { hash: true } },
+		},
 	})
 
 	if (!userWithPassword || !userWithPassword.password) {
@@ -236,5 +237,26 @@ export async function verifyUserPassword(
 		return null
 	}
 
-	return { id: userWithPassword.id }
+	return { id: userWithPassword.id, hospitalId: userWithPassword.hospitalId }
+}
+
+export async function getUserInfo(request: Request) {
+	const authSession = await authSessionStorage.getSession(
+		request.headers.get('cookie'),
+	)
+	const sessionId = authSession.get(sessionKey)
+	if (!sessionId) return null
+	const session = await prisma.session.findUnique({
+		select: { user: { select: { id: true, hospitalId: true } } },
+		where: { id: sessionId, expirationDate: { gt: new Date() } },
+	})
+	if (!session?.user || !session.user.hospitalId) {
+		throw redirect('/', {
+			headers: {
+				'set-cookie': await authSessionStorage.destroySession(authSession),
+			},
+		})
+	}
+	const { id, hospitalId } = session.user
+	return { userId: id, hospitalId }
 }

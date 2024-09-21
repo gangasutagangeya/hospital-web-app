@@ -1,8 +1,19 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
-
+// TODO: Add index for forgien keys
+// TODO: change name of the fields to opt names
+// TODO: Add user role for initial sign up
 generator client {
   provider = "prisma-client-js"
+}
+
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
+
+generator erd {
+  provider = "prisma-erd-generator"
+  theme    = "forest"
 }
 
 datasource db {
@@ -10,69 +21,196 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id       String  @id @default(cuid())
-  email    String  @unique
-  username String  @unique
-  name     String?
+// model User {
+//   id       String  @id @default(cuid())
+//   email    String  @unique
+//   username String  @unique
+//   name     String?
 
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   image       UserImage?
+//   password    Password?
+//   notes       Note[]
+//   roles       Role[]
+//   sessions    Session[]
+//   connections Connection[]
+// }
+
+model Address {
+  id        String   @id @default(cuid())
+  street    String?
+  city      String?
+  district  String?
+  state     String?
+  zip       String?
+  country   String   @default("india")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  image       UserImage?
-  password    Password?
-  notes       Note[]
-  roles       Role[]
-  sessions    Session[]
-  connections Connection[]
+  users    User[]
+  patient  Patient[]
+  hospital Hospital[]
+  Org      Org[]
+
+  @@unique([street, city, state, zip, country])
 }
 
-model Note {
-  id      String @id @default(cuid())
-  title   String
-  content String
+// model Note {
+//   id      String @id @default(cuid())
+//   title   String
+//   content String
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
 
-  owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  ownerId String
+//   owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+//   ownerId String
 
-  images NoteImage[]
+//   images NoteImage[]
 
-  // non-unique foreign key
-  @@index([ownerId])
-  // This helps our order by in the user search a LOT
-  @@index([ownerId, updatedAt])
+//   // non-unique foreign key
+//   @@index([ownerId])
+//   // This helps our order by in the user search a LOT
+//   @@index([ownerId, updatedAt])
+// }
+
+// model NoteImage {
+//   id          String  @id @default(cuid())
+//   altText     String?
+//   contentType String
+//   blob        Bytes
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   note   Note   @relation(fields: [noteId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+//   noteId String
+
+//   // non-unique foreign key
+//   @@index([noteId])
+// }
+
+// model UserImage {
+//   id          String  @id @default(cuid())
+//   altText     String?
+//   contentType String
+//   blob        Bytes
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+//   userId String @unique
+// }
+
+// model Access {
+//   id         Int          @id @default(cuid())
+//   name       String       
+//   createdAt  DateTime     @default(now())
+//   updatedAt  DateTime     @updatedAt
+//   // Permission Permission[]
+// }
+
+// model Permission {
+//   id          String   @id @default(cuid())
+//   entity      Entity   @relation(fields: [entityId], references: [id]) // e.g. appOwner, user, userProfile etc.
+//   action      Action   @relation(fields: [actionId], references: [id]) // e.g. create, read, update, delete
+//   access      Access   @relation(fields: [accessId], references: [id]) // e.g. own or any
+//   description String   @default("")
+//   entityId    Int
+//   actionId    Int
+//   accessId    Int
+//   createdAt   DateTime @default(now())
+//   updatedAt   DateTime @updatedAt
+
+//   roles Role[]
+
+//   @@unique([entityId, actionId, accessId])
+// }
+
+// model Connection {
+//   id           String @id @default(cuid())
+//   providerName String
+//   providerId   String
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+//   userId String
+
+//   @@unique([providerName, providerId])
+// }
+
+model Org {
+  id      String   @id @default(cuid())
+  name    String   @unique
+  address Address? @relation(fields: [addressId], references: [id])
+
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  hospital  Hospital[]
+  addressId String?
 }
 
-model NoteImage {
-  id          String  @id @default(cuid())
-  altText     String?
-  contentType String
-  blob        Bytes
+model Room {
+  id String @id @default(cuid())
+
+  hospital   Hospital @relation(fields: [hospitalId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  hospitalId String
+
+  no        Int
+  type      String
+  available Boolean
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  note   Note   @relation(fields: [noteId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  noteId String
-
-  // non-unique foreign key
-  @@index([noteId])
+  beds      Bed[]
+  inPatient InPatient?
 }
 
-model UserImage {
-  id          String  @id @default(cuid())
-  altText     String?
-  contentType String
-  blob        Bytes
+model Bed {
+  id String @id @default(cuid())
+
+  room   Room   @relation(fields: [roomId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  roomId String
+
+  no        Int
+  available Boolean
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId String @unique
+  inPatient InPatient?
+}
+
+model Hospital {
+  id String @id @default(cuid())
+
+  org       Org     @relation(fields: [orgId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  orgId     String
+  address   Address @relation(fields: [addressId], references: [id])
+  addressId String
+
+  registrationNo String @unique
+  name           String @unique
+  phone          Int    @unique
+  email          String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user                     User[]
+  room                     Room[]
+  inPatient                InPatient[]
+  outPatient               OutPatient[]
+  dischargeSummary         DischargeSummary[]
+  dischargeSummaryTemplate DischargeSummaryTemplate[]
+
+  session Session[]
 }
 
 model Password {
@@ -80,47 +218,6 @@ model Password {
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String @unique
-}
-
-model Session {
-  id             String   @id @default(cuid())
-  expirationDate DateTime
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId String
-
-  // non-unique foreign key
-  @@index([userId])
-}
-
-model Permission {
-  id          String @id @default(cuid())
-  action      String // e.g. create, read, update, delete
-  entity      String // e.g. note, user, etc.
-  access      String // e.g. own or any
-  description String @default("")
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  roles Role[]
-
-  @@unique([action, entity, access])
-}
-
-model Role {
-  id          String @id @default(cuid())
-  name        String @unique
-  description String @default("")
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  users       User[]
-  permissions Permission[]
 }
 
 model Verification {
@@ -154,10 +251,9 @@ model Verification {
   @@unique([target, type])
 }
 
-model Connection {
-  id           String @id @default(cuid())
-  providerName String
-  providerId   String
+model Session {
+  id             String   @id @default(cuid())
+  expirationDate DateTime
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -165,5 +261,275 @@ model Connection {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String
 
-  @@unique([providerName, providerId])
+  hospital Hospital @relation(fields: [hospitalId], references: [id])
+  hospitalId String
+
+  // non-unique foreign key
+  @@index([userId])
+}
+
+model Entity {
+  id   String @id @default(cuid())
+  name String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Permission Permission[]
+
+  @@unique([id, name])
+}
+
+model Action {
+  id   String @id @default(cuid())
+  name String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Permission Permission[]
+
+  @@unique([id, name])
+}
+
+model Role {
+  id          String @id @default(cuid())
+  name        String @unique
+  description String @default("")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user        User[]
+  permissions Permission[]
+}
+
+model Permission {
+  id String @id @default(cuid())
+
+  action     Action @relation(fields: [actionId, actionName], references: [id, name])
+  actionId   String
+  actionName String
+  // entity      String // e.g. note, user, etc.
+  entity     Entity @relation(fields: [entityId, entityName], references: [id, name])
+  entityId   String
+  entityName String
+
+  description String @default("")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  roles Role[]
+
+  @@unique([actionId, entityId])
+}
+
+model User {
+  id String @id @default(cuid())
+
+  hospital   Hospital? @relation(fields: [hospitalId], references: [id])
+  hospitalId String?
+  address    Address   @relation(fields: [addressId], references: [id])
+  addressId  String
+
+  username      String    @unique
+  name          String
+  fatherName    String
+  aadhar        String    @unique
+  qualification String
+  salary        String?
+  email         String    @unique
+  phone         String    @unique
+  password      Password?
+  roles         Role[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  session                    Session[]
+  inPatient                  InPatient[]
+  outPatient                 OutPatient[]
+  docter                     DischargeSummary[]         @relation(name: "docter")
+  dischargeSummaryPreparedBy DischargeSummary[]         @relation(name: "dischargeSummaryPreparedBy")
+  dischargeSummaryCheckedBy  DischargeSummary[]         @relation(name: "dischargeSummaryCheckedBy")
+  dischargeSummaryTemplate   DischargeSummaryTemplate[]
+}
+
+model Patient {
+  id String @id @default(cuid())
+
+  address    Address? @relation(fields: [addressId], references: [id])
+  addressId  String?
+  // TODO: Change to autoincreament and add prefix
+  umr        Int      @unique
+  name       String
+  fatherName String?
+  dob        String?
+  gender     String
+  aadhar     String?
+  bloodGroup String?
+  email      String?
+  phone      String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  inPatient  InPatient[]
+  outPatient OutPatient[]
+
+  @@index([umr])
+  @@index([name])
+  @@index([phone])
+  @@index([aadhar])
+}
+
+model DrugStrength {
+  strength String @id @unique
+
+  SummaryDrugInstruction SummaryDrugInstruction[]
+}
+
+model DrugDuration {
+  duration String @id @unique
+
+  SummaryDrugInstruction SummaryDrugInstruction[]
+}
+
+model DrugFrequency {
+  frequency String @id @unique
+
+  SummaryDrugInstruction SummaryDrugInstruction[]
+}
+
+model DrugTime {
+  time String @id @unique
+
+  SummaryDrugInstruction SummaryDrugInstruction[]
+}
+
+model Drug {
+  name        String  @id @unique
+  description String?
+
+  SummaryDrugInstruction SummaryDrugInstruction[]
+}
+
+model SummaryDrugInstruction {
+  id String @id @default(cuid())
+
+  drug   Drug   @relation(fields: [drugId], references: [name])
+  drugId String
+  strength DrugStrength @relation(fields: [strengthId], references: [strength])
+  strengthId String
+  frequency DrugFrequency @relation(fields: [frequencyId], references: [frequency])
+  frequencyId String
+  duration DrugDuration @relation(fields: [durationId], references: [duration])
+  durationId String
+  time DrugTime @relation(fields: [drugTimeId], references: [time])
+  drugTimeId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  DischargeSummary           DischargeSummary?         @relation(fields: [dischargeSummaryId], references: [id])
+  dischargeSummaryId         String?
+  DischargeSummaryTemplate   DischargeSummaryTemplate? @relation(fields: [dischargeSummaryTemplateId], references: [id])
+  dischargeSummaryTemplateId String?
+}
+
+model DischargeSummary {
+  id String @id @default(cuid())
+
+  docter      User       @relation(name: "docter", fields: [docterId], references: [id])
+  docterId    String
+  hospital    Hospital   @relation(fields: [hospitalId], references: [id])
+  hospitalId  String
+  inPatient   InPatient? @relation(fields: [inPatientId], references: [id])
+  inPatientId String?    @unique
+
+  dischargeDate                 DateTime?
+  diagnosis                     String?
+  finalDiagnosis                String?
+  complaintsOnReporting         String?
+  pastHistory                   String?
+  historyOfPresentingIllness    String?
+  physicalFindingsOfExamination String?
+  laboratoryData                String?
+  investigationProcedure        String?
+  therapeuticProcedure          String?
+  coursesOfTreatmentInHospital  String?
+  summaryOfICUStay              String?
+  futureAdviceOnDischarge       String?
+  summaryDrugInstruction                          SummaryDrugInstruction[]
+  preparedBy                    User                     @relation(name: "dischargeSummaryPreparedBy", fields: [preparedById], references: [id])
+  preparedById                  String
+  checkedBy                     User                     @relation(name: "dischargeSummaryCheckedBy", fields: [checkedById], references: [id])
+  checkedById                   String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model InPatient {
+  id String @id @default(cuid())
+
+  patient    Patient  @relation(fields: [patientId], references: [id])
+  patientId  String
+  room       Room?    @relation(fields: [roomId], references: [id])
+  roomId     String?  @unique
+  bed        Bed?     @relation(fields: [bedId], references: [id])
+  bedId      String?  @unique
+  docter     User     @relation(fields: [docterId], references: [id])
+  docterId   String
+  hospital   Hospital @relation(fields: [hospitalId], references: [id])
+  hospitalId String
+
+  admitDate        DateTime?
+  dischargeDate    DateTime?
+  paymentType      String?
+  dischargeSummary DischargeSummary?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OutPatient {
+  id String @id @default(cuid())
+
+  patient    Patient  @relation(fields: [patientId], references: [id])
+  patientId  String
+  docter     User     @relation(fields: [docterId], references: [id])
+  docterId   String
+  hospital   Hospital @relation(fields: [hospitalId], references: [id])
+  hospitalId String
+
+  appointmentDate DateTime
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model DischargeSummaryTemplate {
+  id String @id @default(cuid())
+
+  docter     User     @relation(fields: [docterId], references: [id])
+  docterId   String
+  hospital   Hospital @relation(fields: [hospitalId], references: [id])
+  hospitalId String
+
+  diagnosis                     String?
+  finalDiagnosis                String?
+  complaintsOnReporting         String?
+  historyOfPresentingIllness    String?
+  physicalFindingsOfExamination String?
+  laboratoryData                String?
+  investigationProcedure        String?
+  therapeuticProcedure          String?
+  coursesOfTreatmentInHospital  String?
+  summaryOfICUStay              String?
+  futureAdviceOnDischarge       String?
+  drug                          SummaryDrugInstruction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

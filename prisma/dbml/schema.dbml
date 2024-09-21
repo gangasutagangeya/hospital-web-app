@@ -1,0 +1,421 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table Address {
+  id String [pk]
+  street String
+  city String
+  district String
+  state String
+  zip String
+  country String [not null, default: 'india']
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  users User [not null]
+  patient Patient [not null]
+  hospital Hospital [not null]
+  Org Org [not null]
+
+  indexes {
+    (street, city, state, zip, country) [unique]
+  }
+}
+
+Table Org {
+  id String [pk]
+  name String [unique, not null]
+  address Address
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  hospital Hospital [not null]
+  addressId String
+}
+
+Table Room {
+  id String [pk]
+  hospital Hospital [not null]
+  hospitalId String [not null]
+  no Int [not null]
+  type String [not null]
+  available Boolean [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  beds Bed [not null]
+  inPatient InPatient
+}
+
+Table Bed {
+  id String [pk]
+  room Room [not null]
+  roomId String [not null]
+  no Int [not null]
+  available Boolean [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  inPatient InPatient
+}
+
+Table Hospital {
+  id String [pk]
+  org Org [not null]
+  orgId String [not null]
+  address Address [not null]
+  addressId String [not null]
+  registrationNo String [unique, not null]
+  name String [unique, not null]
+  phone Int [unique, not null]
+  email String [unique, not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  user User [not null]
+  room Room [not null]
+  inPatient InPatient [not null]
+  outPatient OutPatient [not null]
+  dischargeSummary DischargeSummary [not null]
+  dischargeSummaryTemplate DischargeSummaryTemplate [not null]
+  session Session [not null]
+}
+
+Table Password {
+  hash String [not null]
+  user User [not null]
+  userId String [unique, not null]
+}
+
+Table Verification {
+  id String [pk]
+  createdAt DateTime [default: `now()`, not null]
+  type String [not null, note: 'The type of verification, e.g. "email" or "phone"']
+  target String [not null, note: 'The thing we\'re trying to verify, e.g. a user\'s email or phone number']
+  secret String [not null, note: 'The secret key used to generate the otp']
+  algorithm String [not null, note: 'The algorithm used to generate the otp']
+  digits Int [not null, note: 'The number of digits in the otp']
+  period Int [not null, note: 'The number of seconds the otp is valid for']
+  charSet String [not null, note: 'The valid characters for the otp']
+  expiresAt DateTime [note: 'When it\'s safe to delete this verification']
+
+  indexes {
+    (target, type) [unique]
+  }
+}
+
+Table Session {
+  id String [pk]
+  expirationDate DateTime [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  user User [not null]
+  userId String [not null]
+  hospital Hospital [not null]
+  hospitalId String [not null]
+}
+
+Table Entity {
+  id String [pk]
+  name String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  Permission Permission [not null]
+
+  indexes {
+    (id, name) [unique]
+  }
+}
+
+Table Action {
+  id String [pk]
+  name String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  Permission Permission [not null]
+
+  indexes {
+    (id, name) [unique]
+  }
+}
+
+Table Role {
+  id String [pk]
+  name String [unique, not null]
+  description String [not null, default: '']
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  user User [not null]
+  permissions Permission [not null]
+}
+
+Table Permission {
+  id String [pk]
+  action Action [not null]
+  actionId String [not null]
+  actionName String [not null]
+  entity Entity [not null]
+  entityId String [not null]
+  entityName String [not null]
+  description String [not null, default: '']
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  roles Role [not null]
+
+  indexes {
+    (actionId, entityId) [unique]
+  }
+}
+
+Table User {
+  id String [pk]
+  hospital Hospital
+  hospitalId String
+  address Address [not null]
+  addressId String [not null]
+  username String [unique, not null]
+  name String [not null]
+  fatherName String [not null]
+  aadhar String [unique, not null]
+  qualification String [not null]
+  salary String
+  email String [unique, not null]
+  phone String [unique, not null]
+  password Password
+  roles Role [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  session Session [not null]
+  inPatient InPatient [not null]
+  outPatient OutPatient [not null]
+  docter DischargeSummary [not null]
+  dischargeSummaryPreparedBy DischargeSummary [not null]
+  dischargeSummaryCheckedBy DischargeSummary [not null]
+  dischargeSummaryTemplate DischargeSummaryTemplate [not null]
+}
+
+Table Patient {
+  id String [pk]
+  address Address
+  addressId String
+  umr Int [unique, not null]
+  name String [not null]
+  fatherName String
+  dob String
+  gender String [not null]
+  aadhar String
+  bloodGroup String
+  email String
+  phone String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  inPatient InPatient [not null]
+  outPatient OutPatient [not null]
+}
+
+Table DrugStrength {
+  strength String [pk]
+  SummaryDrugInstruction SummaryDrugInstruction [not null]
+}
+
+Table DrugDuration {
+  duration String [pk]
+  SummaryDrugInstruction SummaryDrugInstruction [not null]
+}
+
+Table DrugFrequency {
+  frequency String [pk]
+  SummaryDrugInstruction SummaryDrugInstruction [not null]
+}
+
+Table DrugTime {
+  time String [pk]
+  SummaryDrugInstruction SummaryDrugInstruction [not null]
+}
+
+Table Drug {
+  name String [pk]
+  description String
+  SummaryDrugInstruction SummaryDrugInstruction [not null]
+}
+
+Table SummaryDrugInstruction {
+  id String [pk]
+  drug Drug [not null]
+  drugId String [not null]
+  strength DrugStrength [not null]
+  strengthId String [not null]
+  frequency DrugFrequency [not null]
+  frequencyId String [not null]
+  duration DrugDuration [not null]
+  durationId String [not null]
+  time DrugTime [not null]
+  drugTimeId String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  DischargeSummary DischargeSummary
+  dischargeSummaryId String
+  DischargeSummaryTemplate DischargeSummaryTemplate
+  dischargeSummaryTemplateId String
+}
+
+Table DischargeSummary {
+  id String [pk]
+  docter User [not null]
+  docterId String [not null]
+  hospital Hospital [not null]
+  hospitalId String [not null]
+  inPatient InPatient
+  inPatientId String [unique]
+  dischargeDate DateTime
+  diagnosis String
+  finalDiagnosis String
+  complaintsOnReporting String
+  pastHistory String
+  historyOfPresentingIllness String
+  physicalFindingsOfExamination String
+  laboratoryData String
+  investigationProcedure String
+  therapeuticProcedure String
+  coursesOfTreatmentInHospital String
+  summaryOfICUStay String
+  futureAdviceOnDischarge String
+  summaryDrugInstruction SummaryDrugInstruction [not null]
+  preparedBy User [not null]
+  preparedById String [not null]
+  checkedBy User [not null]
+  checkedById String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table InPatient {
+  id String [pk]
+  patient Patient [not null]
+  patientId String [not null]
+  room Room
+  roomId String [unique]
+  bed Bed
+  bedId String [unique]
+  docter User [not null]
+  docterId String [not null]
+  hospital Hospital [not null]
+  hospitalId String [not null]
+  admitDate DateTime
+  dischargeDate DateTime
+  paymentType String
+  dischargeSummary DischargeSummary
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table OutPatient {
+  id String [pk]
+  patient Patient [not null]
+  patientId String [not null]
+  docter User [not null]
+  docterId String [not null]
+  hospital Hospital [not null]
+  hospitalId String [not null]
+  appointmentDate DateTime [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table DischargeSummaryTemplate {
+  id String [pk]
+  docter User [not null]
+  docterId String [not null]
+  hospital Hospital [not null]
+  hospitalId String [not null]
+  diagnosis String
+  finalDiagnosis String
+  complaintsOnReporting String
+  historyOfPresentingIllness String
+  physicalFindingsOfExamination String
+  laboratoryData String
+  investigationProcedure String
+  therapeuticProcedure String
+  coursesOfTreatmentInHospital String
+  summaryOfICUStay String
+  futureAdviceOnDischarge String
+  drug SummaryDrugInstruction [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table RoleToUser {
+  userId String [ref: > User.id]
+  rolesId String [ref: > Role.id]
+}
+
+Table PermissionToRole {
+  permissionsId String [ref: > Permission.id]
+  rolesId String [ref: > Role.id]
+}
+
+Ref: Org.addressId > Address.id
+
+Ref: Room.hospitalId > Hospital.id [delete: Cascade]
+
+Ref: Bed.roomId > Room.id [delete: Cascade]
+
+Ref: Hospital.orgId > Org.id [delete: Cascade]
+
+Ref: Hospital.addressId > Address.id
+
+Ref: Password.userId - User.id [delete: Cascade]
+
+Ref: Session.userId > User.id [delete: Cascade]
+
+Ref: Session.hospitalId > Hospital.id
+
+Ref: Permission.(actionId, actionName) > Action.(id, name)
+
+Ref: Permission.(entityId, entityName) > Entity.(id, name)
+
+Ref: User.hospitalId > Hospital.id
+
+Ref: User.addressId > Address.id
+
+Ref: Patient.addressId > Address.id
+
+Ref: SummaryDrugInstruction.drugId > Drug.name
+
+Ref: SummaryDrugInstruction.strengthId > DrugStrength.strength
+
+Ref: SummaryDrugInstruction.frequencyId > DrugFrequency.frequency
+
+Ref: SummaryDrugInstruction.durationId > DrugDuration.duration
+
+Ref: SummaryDrugInstruction.drugTimeId > DrugTime.time
+
+Ref: SummaryDrugInstruction.dischargeSummaryId > DischargeSummary.id
+
+Ref: SummaryDrugInstruction.dischargeSummaryTemplateId > DischargeSummaryTemplate.id
+
+Ref: DischargeSummary.docterId > User.id
+
+Ref: DischargeSummary.hospitalId > Hospital.id
+
+Ref: DischargeSummary.inPatientId - InPatient.id
+
+Ref: DischargeSummary.preparedById > User.id
+
+Ref: DischargeSummary.checkedById > User.id
+
+Ref: InPatient.patientId > Patient.id
+
+Ref: InPatient.roomId - Room.id
+
+Ref: InPatient.bedId - Bed.id
+
+Ref: InPatient.docterId > User.id
+
+Ref: InPatient.hospitalId > Hospital.id
+
+Ref: OutPatient.patientId > Patient.id
+
+Ref: OutPatient.docterId > User.id
+
+Ref: OutPatient.hospitalId > Hospital.id
+
+Ref: DischargeSummaryTemplate.docterId > User.id
+
+Ref: DischargeSummaryTemplate.hospitalId > Hospital.id

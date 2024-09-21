@@ -53,7 +53,7 @@ import { useRequestInfo } from './utils/request-info.ts'
 import { type Theme, setTheme, getTheme } from './utils/theme.server.ts'
 import { makeTimings, time } from './utils/timing.server.ts'
 import { getToast } from './utils/toast.server.ts'
-import { useOptionalUser, useUser } from './utils/user.ts'
+import { useOptionalUser, useUser, userHasRole } from './utils/user.ts'
 
 export const links: LinksFunction = () => {
 	return [
@@ -102,12 +102,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
 							id: true,
 							name: true,
 							username: true,
-							image: { select: { id: true } },
+							hospitalId: true,
 							roles: {
 								select: {
 									name: true,
 									permissions: {
-										select: { entity: true, action: true, access: true },
+										select: { actionName: true, entityName: true },
 									},
 								},
 							},
@@ -117,6 +117,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 				{ timings, type: 'find user', desc: 'find user in root' },
 			)
 		: null
+
 	if (userId && !user) {
 		console.info('something weird happened')
 		// something weird happened... The user is authenticated but we can't find
@@ -282,6 +283,7 @@ export default withSentry(AppWithProviders)
 
 function UserDropdown() {
 	const user = useUser()
+	const isAdmin = userHasRole(user, 'appOwner')
 	const submit = useSubmit()
 	const formRef = useRef<HTMLFormElement>(null)
 	return (
@@ -314,6 +316,15 @@ function UserDropdown() {
 							</Icon>
 						</Link>
 					</DropdownMenuItem>
+					{isAdmin ? (
+						<DropdownMenuItem asChild>
+							<Link prefetch="intent" to={`/app-owner`}>
+								<Icon className="text-body-md" name="update">
+									App Owner
+								</Icon>
+							</Link>
+						</DropdownMenuItem>
+					) : null}
 					{/* <DropdownMenuItem asChild>
 						<Link prefetch="intent" to={`/users/${user.username}/notes`}>
 							<Icon className="text-body-md" name="pencil-2">

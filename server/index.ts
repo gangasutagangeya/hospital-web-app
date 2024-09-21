@@ -67,8 +67,8 @@ app.use(compression())
 // http://expressjs.com/en/advanced/best-practice-security.html#at-a-minimum-disable-x-powered-by-header
 app.disable('x-powered-by')
 
-app.use(Sentry.Handlers.requestHandler())
-app.use(Sentry.Handlers.tracingHandler())
+// app.use(Sentry.Handlers.requestHandler())
+// app.use(Sentry.Handlers.tracingHandler())
 
 if (viteDevServer) {
 	app.use(viteDevServer.middlewares)
@@ -164,7 +164,7 @@ const strongRateLimit = rateLimit({
 	windowMs: 60 * 1000,
 	max: 100 * maxMultiple,
 })
-
+// TODO: Add routes here for rate limiting
 const generalRateLimit = rateLimit(rateLimitDefault)
 app.use((req, res, next) => {
 	const strongPaths = [
@@ -206,7 +206,7 @@ async function getBuild() {
 
 app.all(
 	'*',
-	createRequestHandler({
+	_createRequestHandler({
 		getLoadContext: (_: any, res: any) => ({
 			cspNonce: res.locals.cspNonce,
 			serverBuild: getBuild(),

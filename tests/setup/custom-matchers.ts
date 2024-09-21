@@ -76,14 +76,14 @@ expect.extend({
 	async toHaveSessionForUser(response: Response, userId: string) {
 		const setCookies = getSetCookie(response.headers)
 		const sessionSetCookie = setCookies.find(
-			c => setCookieParser.parseString(c).name === 'en_session',
+			c => setCookieParser.parseString(c).name === 'gaga_hms_session',
 		)
 
 		if (!sessionSetCookie) {
 			return {
 				pass: false,
 				message: () =>
-					`The en_session set-cookie header was${
+					`The gaga_hms_session set-cookie header was${
 						this.isNot ? '' : ' not'
 					} defined`,
 			}
@@ -117,14 +117,14 @@ expect.extend({
 	async toSendToast(response: Response, toast: ToastInput) {
 		const setCookies = getSetCookie(response.headers)
 		const toastSetCookie = setCookies.find(
-			c => setCookieParser.parseString(c).name === 'en_toast',
+			c => setCookieParser.parseString(c).name === 'gaga_hms_toast',
 		)
 
 		if (!toastSetCookie) {
 			return {
 				pass: false,
 				message: () =>
-					`en_toast set-cookie header was${this.isNot ? '' : ' not'} defined`,
+					`gaga_hms_toast set-cookie header was${this.isNot ? '' : ' not'} defined`,
 			}
 		}
 

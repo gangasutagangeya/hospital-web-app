@@ -14,6 +14,7 @@ export const prisma = remember('prisma', () => {
 			{ level: 'query', emit: 'event' },
 			{ level: 'error', emit: 'stdout' },
 			{ level: 'warn', emit: 'stdout' },
+			{ level: 'info', emit: 'stdout' },
 		],
 	})
 	client.$on('query', async e => {

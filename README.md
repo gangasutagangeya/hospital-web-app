@@ -1,54 +1,84 @@
-<div align="center">
-  <h1 align="center"><a href="https://www.epicweb.dev/epic-stack">The Epic Stack 🚀</a></h1>
-  <strong align="center">
-    Ditch analysis paralysis and start shipping Epic Web apps.
-  </strong>
-  <p>
-    This is an opinionated project starter and reference that allows teams to
-    ship their ideas to production faster and on a more stable foundation based
-    on the experience of <a href="https://kentcdodds.com">Kent C. Dodds</a> and
-    <a href="https://github.com/epicweb-dev/epic-stack/graphs/contributors">contributors</a>.
-  </p>
-</div>
+## Commands
+
+- Prisma format file
+
+```sh
+npx prisma formate
+```
+
+- To load prisma and generate DBML schema
+
+```sh
+npm prisma generate
+```
+
+- To seed again if we made anychanges
+
+```sh
+npx prisma db seed
+```
+
+- To genrate migrations use below command for new and when ever there is change
+  in the schema file
+
+```sh
+npx prisma migrate dev --name connections
+```
+
+- To check the routes in the app
 
 ```sh
 npx create-epic-app@latest
 ```
 
-[![The Epic Stack](https://github-production-user-asset-6210df.s3.amazonaws.com/1500684/246885449-1b00286c-aa3d-44b2-9ef2-04f694eb3592.png)](https://www.epicweb.dev/epic-stack)
+Push vs Deploy `Push` when experimenting locally, `migrate` when you're ready to
+commit schema changes
 
-[The Epic Stack](https://www.epicweb.dev/epic-stack)
+- Creates individual migration files
 
-<hr />
+```sh
+npx prisma migrate deploy
+```
 
-## Watch Kent's Introduction to The Epic Stack
+- Use this command when developing in local
 
-[![Epic Stack Talk slide showing Flynn Rider with knives, the text "I've been around and I've got opinions" and Kent speaking in the corner](https://github-production-user-asset-6210df.s3.amazonaws.com/1500684/277818553-47158e68-4efc-43ae-a477-9d1670d4217d.png)](https://www.epicweb.dev/talks/the-epic-stack)
+```sh
+npx prisma db push
+or
+npx prisma migrate push
+```
 
-["The Epic Stack" by Kent C. Dodds](https://www.epicweb.dev/talks/the-epic-stack)
+- Use to reset the database with data in seed.ts file
 
-## Docs
+```sh
+npx prisma migrate reset
+```
 
-[Read the docs](https://github.com/epicweb-dev/epic-stack/blob/main/docs)
-(please 🙏).
+- This command will delete all the data and construct from seed file again
 
-## Support
+```sh
+npx prisma db seed
+```
 
-- 🆘 Join the
-  [discussion on GitHub](https://github.com/epicweb-dev/epic-stack/discussions)
-  and the [KCD Community on Discord](https://kcd.im/discord).
-- 💡 Create an
-  [idea discussion](https://github.com/epicweb-dev/epic-stack/discussions/new?category=ideas)
-  for suggestions.
-- 🐛 Open a [GitHub issue](https://github.com/epicweb-dev/epic-stack/issues) to
-  report a bug.
+- one way to find and understand optimization opportunities is to use
 
-## Branding
+```sh
+EXPLAIN QUERY PLAN
+```
 
-Want to talk about the Epic Stack in a blog post or talk? Great! Here are some
-assets you can use in your material:
-[EpicWeb.dev/brand](https://epicweb.dev/brand)
+```sh
+EXPLAIN QUERY PLAN SELECT * FROM user WHERE name = 'Alice';
 
-## Thanks
+QUERY PLAN
+`--SCAN user
+```
 
-You rock 🪨
+- To find all the indexes in database
+
+```sh
+SELECT name from sqlite_master where type = "index";
+```
+
+## TODOs
+
+- Add URIs to rate limiter code in server.ts

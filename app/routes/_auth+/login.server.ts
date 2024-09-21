@@ -22,7 +22,7 @@ export async function handleNewSession(
 		remember,
 	}: {
 		request: Request
-		session: { userId: string; id: string; expirationDate: Date }
+		session: { id: string; expirationDate: Date }
 		redirectTo?: string
 		remember: boolean
 	},
@@ -31,7 +31,7 @@ export async function handleNewSession(
 	const verification = await prisma.verification.findUnique({
 		select: { id: true },
 		where: {
-			target_type: { target: session.userId, type: twoFAVerificationType },
+			target_type: { target: session.id, type: twoFAVerificationType },
 		},
 	})
 	const userHasTwoFactor = Boolean(verification)
@@ -43,7 +43,7 @@ export async function handleNewSession(
 		const redirectUrl = getRedirectToUrl({
 			request,
 			type: twoFAVerificationType,
-			target: session.userId,
+			target: session.id,
 			redirectTo,
 		})
 		return redirect(
