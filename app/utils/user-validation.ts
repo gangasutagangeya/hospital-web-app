@@ -1,3 +1,4 @@
+import { count } from 'console'
 import { z } from 'zod'
 
 export const UsernameSchema = z
@@ -57,12 +58,16 @@ export const AadharSchema = z
 	.length(12)
 export const AddressSchema = z
 	.object({
+		street: z.string().optional(),
 		town: z.string({
 			required_error: 'Town is required',
 		}),
 		district: z.string({
 			required_error: 'District is required',
 		}),
+		state: z.string().optional(),
+		country: z.string().optional(),
+		zip: z.string().optional(),
 	})
 	.required()
 export const MobileSchema = z

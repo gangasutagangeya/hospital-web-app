@@ -1,19 +1,14 @@
 import { requireUserId } from '#app/utils/auth.server.js'
 import { getDefaultFromToDates } from '#app/utils/misc.js'
 import { LoaderFunctionArgs } from '@remix-run/node'
-import {
-	Outlet,
-	Link,
-	redirect,
-	useMatches,
-	json,
-	useLoaderData,
-} from '@remix-run/react'
+import { Outlet, Link, useMatches, useLoaderData } from '@remix-run/react'
 
 const SEARCH_PATH = '/in-patients/search'
 const REGISTRATION_PATH = '/in-patients/registration'
-const DISCHARGE_SUMMARY_PATH = '/in-patients/discharge-summary/new'
+const TEMPLATES_PATH = '/in-patients/ds/template'
+
 export async function loader({ request }: LoaderFunctionArgs) {
+	// TODO: Handle require user properly
 	await requireUserId(request)
 	return null
 }
@@ -30,7 +25,7 @@ export default function Index() {
 					className={`flex items-center ${currentRoute === SEARCH_PATH ? 'rounded-2xl bg-muted' : ''}`}
 				>
 					<Link
-						to={`${SEARCH_PATH}?fromDate=${fromDate}&toDate=${toDate}`}
+						to={`${SEARCH_PATH}/date?fromDate=${fromDate}&toDate=${toDate}`}
 						className="group grid"
 					>
 						<span className="p-2 transition group-hover:-translate-x-1">
@@ -48,11 +43,11 @@ export default function Index() {
 					</Link>
 				</div>
 				<div
-					className={`flex items-center ${currentRoute?.includes('discharge-summary') ? 'rounded-2xl bg-muted' : ''}`}
+					className={`flex items-center ${currentRoute?.includes('template') ? 'rounded-2xl bg-muted' : ''}`}
 				>
-					<Link to={DISCHARGE_SUMMARY_PATH} className="group grid">
+					<Link to={TEMPLATES_PATH} className="group grid">
 						<span className="p-2 transition group-hover:-translate-x-1">
-							Discharge Summary
+							Templates
 						</span>
 					</Link>
 				</div>

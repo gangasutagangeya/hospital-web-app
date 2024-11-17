@@ -17,7 +17,7 @@ export const logos = [
 	{
 		src: inPatient,
 		alt: 'In Patients',
-		href: `/in-patients/search?fromDate=${fromDate}&toDate=${toDate}`,
+		href: `/in-patients/search/date?fromDate=${fromDate}&toDate=${toDate}`,
 		column: 2,
 		row: 1,
 	},

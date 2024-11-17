@@ -51,7 +51,7 @@ CREATE TABLE "Hospital" (
     "addressId" TEXT NOT NULL,
     "registrationNo" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "phone" INTEGER NOT NULL,
+    "phone" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL,
@@ -170,28 +170,30 @@ CREATE TABLE "Patient" (
 
 -- CreateTable
 CREATE TABLE "DrugStrength" (
-    "strength" TEXT NOT NULL PRIMARY KEY
+    "id" TEXT NOT NULL PRIMARY KEY
 );
 
 -- CreateTable
 CREATE TABLE "DrugDuration" (
-    "duration" TEXT NOT NULL PRIMARY KEY
+    "id" TEXT NOT NULL PRIMARY KEY
 );
 
 -- CreateTable
 CREATE TABLE "DrugFrequency" (
-    "frequency" TEXT NOT NULL PRIMARY KEY
+    "id" TEXT NOT NULL PRIMARY KEY
 );
 
 -- CreateTable
 CREATE TABLE "DrugTime" (
-    "time" TEXT NOT NULL PRIMARY KEY
+    "id" TEXT NOT NULL PRIMARY KEY
 );
 
 -- CreateTable
 CREATE TABLE "Drug" (
-    "name" TEXT NOT NULL PRIMARY KEY,
-    "description" TEXT
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "description" TEXT,
+    "hospitalId" TEXT NOT NULL,
+    CONSTRAINT "Drug_hospitalId_fkey" FOREIGN KEY ("hospitalId") REFERENCES "Hospital" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- CreateTable
@@ -206,11 +208,11 @@ CREATE TABLE "SummaryDrugInstruction" (
     "updatedAt" DATETIME NOT NULL,
     "dischargeSummaryId" TEXT,
     "dischargeSummaryTemplateId" TEXT,
-    CONSTRAINT "SummaryDrugInstruction_drugId_fkey" FOREIGN KEY ("drugId") REFERENCES "Drug" ("name") ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT "SummaryDrugInstruction_strengthId_fkey" FOREIGN KEY ("strengthId") REFERENCES "DrugStrength" ("strength") ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT "SummaryDrugInstruction_frequencyId_fkey" FOREIGN KEY ("frequencyId") REFERENCES "DrugFrequency" ("frequency") ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT "SummaryDrugInstruction_durationId_fkey" FOREIGN KEY ("durationId") REFERENCES "DrugDuration" ("duration") ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT "SummaryDrugInstruction_drugTimeId_fkey" FOREIGN KEY ("drugTimeId") REFERENCES "DrugTime" ("time") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "SummaryDrugInstruction_drugId_fkey" FOREIGN KEY ("drugId") REFERENCES "Drug" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "SummaryDrugInstruction_strengthId_fkey" FOREIGN KEY ("strengthId") REFERENCES "DrugStrength" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "SummaryDrugInstruction_frequencyId_fkey" FOREIGN KEY ("frequencyId") REFERENCES "DrugFrequency" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "SummaryDrugInstruction_durationId_fkey" FOREIGN KEY ("durationId") REFERENCES "DrugDuration" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "SummaryDrugInstruction_drugTimeId_fkey" FOREIGN KEY ("drugTimeId") REFERENCES "DrugTime" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT "SummaryDrugInstruction_dischargeSummaryId_fkey" FOREIGN KEY ("dischargeSummaryId") REFERENCES "DischargeSummary" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT "SummaryDrugInstruction_dischargeSummaryTemplateId_fkey" FOREIGN KEY ("dischargeSummaryTemplateId") REFERENCES "DischargeSummaryTemplate" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
@@ -222,6 +224,7 @@ CREATE TABLE "DischargeSummary" (
     "hospitalId" TEXT NOT NULL,
     "inPatientId" TEXT,
     "dischargeDate" DATETIME,
+    "admitDate" DATETIME,
     "diagnosis" TEXT,
     "finalDiagnosis" TEXT,
     "complaintsOnReporting" TEXT,
@@ -282,7 +285,8 @@ CREATE TABLE "OutPatient" (
 -- CreateTable
 CREATE TABLE "DischargeSummaryTemplate" (
     "id" TEXT NOT NULL PRIMARY KEY,
-    "docterId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "createdBy" TEXT NOT NULL,
     "hospitalId" TEXT NOT NULL,
     "diagnosis" TEXT,
     "finalDiagnosis" TEXT,
@@ -295,9 +299,10 @@ CREATE TABLE "DischargeSummaryTemplate" (
     "coursesOfTreatmentInHospital" TEXT,
     "summaryOfICUStay" TEXT,
     "futureAdviceOnDischarge" TEXT,
+    "pastHistory" TEXT,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL,
-    CONSTRAINT "DischargeSummaryTemplate_docterId_fkey" FOREIGN KEY ("docterId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "DischargeSummaryTemplate_createdBy_fkey" FOREIGN KEY ("createdBy") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT "DischargeSummaryTemplate_hospitalId_fkey" FOREIGN KEY ("hospitalId") REFERENCES "Hospital" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
@@ -384,19 +389,19 @@ CREATE INDEX "Patient_phone_idx" ON "Patient"("phone");
 CREATE INDEX "Patient_aadhar_idx" ON "Patient"("aadhar");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "DrugStrength_strength_key" ON "DrugStrength"("strength");
+CREATE UNIQUE INDEX "DrugStrength_id_key" ON "DrugStrength"("id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "DrugDuration_duration_key" ON "DrugDuration"("duration");
+CREATE UNIQUE INDEX "DrugDuration_id_key" ON "DrugDuration"("id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "DrugFrequency_frequency_key" ON "DrugFrequency"("frequency");
+CREATE UNIQUE INDEX "DrugFrequency_id_key" ON "DrugFrequency"("id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "DrugTime_time_key" ON "DrugTime"("time");
+CREATE UNIQUE INDEX "DrugTime_id_key" ON "DrugTime"("id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Drug_name_key" ON "Drug"("name");
+CREATE UNIQUE INDEX "Drug_id_key" ON "Drug"("id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "DischargeSummary_inPatientId_key" ON "DischargeSummary"("inPatientId");
@@ -406,6 +411,9 @@ CREATE UNIQUE INDEX "InPatient_roomId_key" ON "InPatient"("roomId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "InPatient_bedId_key" ON "InPatient"("bedId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "DischargeSummaryTemplate_name_key" ON "DischargeSummaryTemplate"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_RoleToUser_AB_unique" ON "_RoleToUser"("A", "B");

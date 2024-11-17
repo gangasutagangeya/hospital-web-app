@@ -13,10 +13,10 @@ import { getUserInfo } from '#app/utils/auth.server.js'
 import { checkHoneypot } from '#app/utils/honeypot.server.js'
 import { useIsPending } from '#app/utils/misc.js'
 import {
-	getDischargeSummaryInfo,
-	updateDischargeSummary,
+	getDischargeSummaryTemplateInfo,
+	createDischargeSummary,
 } from '#app/utils/patients.server.js'
-import { redirectWithToast } from '#app/utils/toast.server.js'
+
 import {
 	getFormProps,
 	getInputProps,
@@ -28,10 +28,20 @@ import {
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
 import { ActionFunctionArgs, json, LoaderFunctionArgs } from '@remix-run/node'
-import { Form, useLoaderData } from '@remix-run/react'
+import { Form, Link, useLoaderData, useSubmit } from '@remix-run/react'
 import { useRef, useState } from 'react'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import { z } from 'zod'
+import { fakerEN_IN as faker } from '@faker-js/faker'
+import { userInfo } from 'os'
+import { redirectWithToast } from '#app/utils/toast.server.js'
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuPortal,
+	DropdownMenuTrigger,
+} from '#app/components/ui/dropdown-menu.js'
 
 const DrugFieldlistSchema = z.object({
 	name: z.string(),
@@ -41,7 +51,8 @@ const DrugFieldlistSchema = z.object({
 	time: z.string(),
 })
 
-const EditDischargeSummaryFormSchema = z.object({
+const AddDischargeSummaryFormSchema = z.object({
+	diagnosis: z.string(),
 	finalDiagnosis: z.string(),
 	complaintsOnReporting: z.string().optional(),
 	pastHistory: z.string().optional(),
@@ -56,47 +67,121 @@ const EditDischargeSummaryFormSchema = z.object({
 	dischargeDate: z.date().optional(),
 	admitDate: z.date().optional(),
 	summaryDrugInstruction: z.array(DrugFieldlistSchema).optional(),
-	dischargeSummaryId: z.string(),
+	userId: z.string(),
 	hospitalId: z.string(),
-	paymentType: z.enum(['Card', 'Cash', 'UPI', 'Insurance']),
+	inPatientId: z.string(),
+	paymentType: z.string().optional(),
 })
+
+const summaryDrugInstruction = []
+const drugTimes = [{ id: 'before' }, { id: 'after' }]
+const durations = [
+	{ id: '1 day' },
+	{ id: '2 days' },
+	{ id: '3 days' },
+	{ id: '4 days' },
+	{ id: '5 days' },
+	{ id: '6 days' },
+	{ id: '7 days' },
+	{ id: '8 days' },
+	{ id: '9 days' },
+	{ id: '10 days' },
+]
+const drugStrengths = [
+	{ id: '1mg' },
+	{ id: '2mg' },
+	{ id: '3mg' },
+	{ id: '4mg' },
+	{ id: '5mg' },
+	{ id: '6mg' },
+	{ id: '7mg' },
+	{ id: '8mg' },
+	{ id: '9mg' },
+	{ id: '10mg' },
+]
+const frequencies = [
+	{ id: '001' },
+	{ id: '010' },
+	{ id: '100' },
+	{ id: '101' },
+	{ id: '110' },
+	{ id: '111' },
+]
+
+for (let i = 0; i < 11; i++) {
+	summaryDrugInstruction.push({
+		name: faker.lorem.word(),
+		strength:
+			drugStrengths[
+				faker.number.int({
+					min: 0,
+					max: drugStrengths.length - 1,
+				})
+			].id,
+		frequency:
+			frequencies[
+				faker.number.int({
+					min: 0,
+					max: frequencies.length - 1,
+				})
+			].id,
+		duration:
+			durations[
+				faker.number.int({
+					min: 0,
+					max: durations.length - 1,
+				})
+			].id,
+		time: drugTimes[faker.number.int({ min: 0, max: drugTimes.length - 1 })].id,
+	})
+}
+
+const defaultValue = {
+	dischargeDate: new Date().toISOString().split('T')[0],
+	admitDate: new Date(new Date().setDate(new Date().getDate() - 3))
+		.toISOString()
+		.split('T')[0],
+	diagnosis: faker.lorem.paragraphs(),
+	finalDiagnosis: faker.lorem.paragraphs(),
+	complaintsOnReporting: faker.lorem.paragraphs(),
+	pastHistory: faker.lorem.paragraphs(),
+	historyOfPresentingIllness: faker.lorem.paragraphs(),
+	physicalFindingsOfExamination: faker.lorem.paragraphs(),
+	laboratoryData: faker.lorem.paragraphs(),
+	investigationProcedure: faker.lorem.paragraphs(),
+	therapeuticProcedure: faker.lorem.paragraphs(),
+	coursesOfTreatmentInHospital: faker.lorem.paragraphs(),
+	summaryOfICUStay: faker.lorem.paragraphs(),
+	futureAdviceOnDischarge: faker.lorem.paragraphs(),
+	summaryDrugInstruction: summaryDrugInstruction,
+}
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
 	const url = new URL(request.url)
 	const userInfo = await getUserInfo(request)
 	invariantResponse(userInfo, 'User info not found', { status: 404 })
-	const { dischargeSummaryId } = params
-	invariantResponse(dischargeSummaryId, 'Discharge Summary is not available', {
+	const { inPatientId, templateId } = params
+	invariantResponse(inPatientId, 'In Patient is not available', {
 		status: 404,
 	})
-	const dischargeSummaryInfo = await getDischargeSummaryInfo({
-		dischargeSummaryId,
+	invariantResponse(templateId, 'Template name is not available', {
+		status: 404,
+	})
+	const templateInfo = await getDischargeSummaryTemplateInfo({
 		hospitalId: userInfo.hospitalId,
+		templateId,
 	})
-	const admitDate = dischargeSummaryInfo.admitDate
-	const dischargeDate = dischargeSummaryInfo.dischargeDate
-	const modifiedAdmitDate = admitDate
-		? admitDate.toISOString().split('T')[0]
-		: ''
-	const modifiedDischargeDate = dischargeDate
-		? dischargeDate.toISOString().split('T')[0]
-		: ''
-	return json({
-		...dischargeSummaryInfo,
-		admitDate: modifiedAdmitDate,
-		dischargeDate: modifiedDischargeDate,
-	})
+	return json({ ...userInfo, inPatientId, templateInfo })
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-	// TODO: How check if there is changes in data from previous state
-	const userInfo = await getUserInfo(request)
+	// TODO: Add userInfo to input field
 	invariantResponse(userInfo, 'User info not found', { status: 404 })
 	const formData = await request.formData()
 	checkHoneypot(formData)
 	const submission = await parseWithZod(formData, {
 		schema: intent =>
-			EditDischargeSummaryFormSchema.transform(async data => {
+			AddDischargeSummaryFormSchema.transform(async data => {
 				if (intent !== null) return { ...data, session: null }
 
 				return { ...data }
@@ -106,16 +191,16 @@ export async function action({ request }: ActionFunctionArgs) {
 	if (submission.status !== 'success') {
 		return json({ status: submission.status === 'error' ? 400 : 200 })
 	}
-	const dischargeSummaryInfo = await updateDischargeSummary({
+	const dischargeSummaryId = await createDischargeSummary({
 		dischargeSummary: submission.value,
 	})
-	if (dischargeSummaryInfo) {
+	if (dischargeSummaryId) {
 		return redirectWithToast(
-			`/in-patients/ds/${dischargeSummaryInfo.id}/view`,
+			`/in-patients/ds/${dischargeSummaryId}/view`,
 			{
 				type: 'success',
-				title: 'Discharge Summary updated',
-				description: 'Discharge Summary has been updated successfully.',
+				title: 'Discharge Summary created',
+				description: 'Discharge Summary has been created successfully.',
 			},
 			{ status: 302 },
 		)
@@ -124,14 +209,14 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 export default function ShowDischargeSummary() {
 	const isPending = useIsPending()
-	const data = useLoaderData<typeof loader>()
-
+	const { templateInfo, inPatientId, hospitalId, userId } =
+		useLoaderData<typeof loader>()
 	const [form, fields] = useForm({
 		id: 'in-patient-registration-form',
-		constraint: getZodConstraint(EditDischargeSummaryFormSchema),
-		defaultValue: { ...data },
+		constraint: getZodConstraint(AddDischargeSummaryFormSchema),
+		defaultValue: { ...templateInfo },
 		onValidate({ formData }) {
-			return parseWithZod(formData, { schema: EditDischargeSummaryFormSchema })
+			return parseWithZod(formData, { schema: AddDischargeSummaryFormSchema })
 		},
 		shouldRevalidate: 'onBlur',
 	})
@@ -139,18 +224,28 @@ export default function ShowDischargeSummary() {
 	return (
 		<div className="container flex min-h-full flex-col justify-center rounded-3xl bg-muted pb-32 pt-10">
 			<div className="max-w-2lg mx-auto w-full">
-				<div className="flex flex-col gap-3 text-center">
-					<h1 className="text-h1">Discharge Summary!</h1>
-					<p className="text-body-md text-muted-foreground">
-						Edit Discharge Summary Details
-					</p>
-				</div>
 				<Spacer size="xs" />
 				<Form method="POST" {...getFormProps(form)}>
 					<HoneypotInputs />
-					<input type="hidden" name="dischargeSummaryId" value={data.id} />
-					<input type="hidden" name="hospitalId" value={data.hospitalId} />
+					<input type="hidden" name="userId" value={userId} />
+					<input type="hidden" name="hospitalId" value={hospitalId} />
+					<input type="hidden" name="inPatientId" value={inPatientId} />
+					<div className="">
+						<div className="flex items-center gap-2 pb-5">
+							<span className="text-sm font-semibold">
+								Name of the Template Selected:
+							</span>
+							<p className="text-sm">{templateInfo.name}</p>
+						</div>
+					</div>
 					<div>
+						<TextareaField
+							labelProps={{ children: 'Diagnosis' }}
+							textareaProps={{
+								...getTextareaProps(fields.diagnosis),
+							}}
+							errors={fields.diagnosis.errors}
+						/>
 						<TextareaField
 							labelProps={{ children: 'Final Diagnosis' }}
 							textareaProps={{
@@ -248,7 +343,7 @@ export default function ShowDischargeSummary() {
 									return (
 										<li key={drug.key}>
 											<div className="flex gap-4">
-												<DrugChooser drug={drug} />
+												<DrugChooser drug={drug} index={index} />
 												<button
 													className="text-foreground-destructive"
 													{...form.remove.getButtonProps({
@@ -274,19 +369,6 @@ export default function ShowDischargeSummary() {
 						<div>
 							<Field
 								labelProps={{
-									htmlFor: fields.admitDate.id,
-									children: 'Admit Date',
-								}}
-								inputProps={{
-									...getInputProps(fields.admitDate, { type: 'date' }),
-									autoComplete: 'admitDate',
-								}}
-								errors={fields.admitDate.errors}
-							/>
-						</div>
-						<div>
-							<Field
-								labelProps={{
 									htmlFor: fields.dischargeDate.id,
 									children: 'Discharge Date',
 								}}
@@ -296,24 +378,34 @@ export default function ShowDischargeSummary() {
 								}}
 								errors={fields.dischargeDate.errors}
 							/>
+							<DropdownField
+								labelProps={{
+									htmlFor: fields.paymentType.id,
+									children: 'Payment Type',
+								}}
+								selectProps={getSelectProps(fields.paymentType)}
+								errors={fields.paymentType.errors}
+								dropDownOptions={[
+									{ value: 'Card', label: 'Card' },
+									{ value: 'Cash', label: 'Cash' },
+									{ value: 'UPI', label: 'UPI' },
+									{ value: 'Insurance', label: 'Insurance' },
+								]}
+							/>
 						</div>
-					</div>
-					<div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 lg:gap-8 xl:gap-12">
-						<DropdownField
-							labelProps={{
-								htmlFor: fields.paymentType.id,
-								children: 'Payment Type',
-							}}
-							selectProps={getSelectProps(fields.paymentType)}
-							errors={fields.paymentType.errors}
-							// autoComplete="paymentType"
-							dropDownOptions={[
-								{ value: 'Card', label: 'Card' },
-								{ value: 'Cash', label: 'Cash' },
-								{ value: 'UPI', label: 'UPI' },
-								{ value: 'Insurance', label: 'Insurance' },
-							]}
-						/>
+						<div>
+							<Field
+								labelProps={{
+									htmlFor: fields.admitDate.id,
+									children: 'Admit Date',
+								}}
+								inputProps={{
+									...getInputProps(fields.admitDate, { type: 'date' }),
+									autoComplete: 'dob',
+								}}
+								errors={fields.admitDate.errors}
+							/>
+						</div>
 					</div>
 					<ErrorList errors={form.errors} id={form.errorId} />
 					<div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 lg:gap-8 xl:gap-12">
@@ -352,14 +444,14 @@ export function ErrorBoundary() {
 
 function DrugChooser({
 	drug,
+	index,
 }: {
 	drug: FieldMetadata<z.infer<typeof DrugFieldlistSchema>>
+	index: number
 }) {
 	const ref = useRef<HTMLFieldSetElement>(null)
-	// const fields = useFieldset(ref, config)
 	const drugFields = drug.getFieldset()
-	// const existingImage = Boolean(drugFields.name.id.defaultValue)
-	const [showEditName, setEditName] = useState(false)
+	// const [showEditName, setEditName] = useState(false)
 	return (
 		<fieldset
 			ref={ref}
@@ -368,6 +460,7 @@ function DrugChooser({
 			// aria-describedby={
 			// 	drugFields.errors?.length ? drugFields.errorId : undefined
 			// }
+			key={drug.key}
 		>
 			<div className="flex flex-wrap gap-3 sm:flex-nowrap">
 				<Field
@@ -405,7 +498,7 @@ function DrugChooser({
 				/>
 				<DropdownField
 					labelProps={{
-						htmlFor: drugFields.frequency.id,
+						htmlFor: `${drugFields.frequency.id}${index}`,
 						children: 'Frequency',
 					}}
 					selectProps={getSelectProps(drugFields.frequency)}
@@ -422,7 +515,7 @@ function DrugChooser({
 				/>
 				<DropdownField
 					labelProps={{
-						htmlFor: drugFields.time.id,
+						htmlFor: `${drugFields.time.id}${index}`,
 						children: 'When',
 					}}
 					selectProps={getSelectProps(drugFields.time)}

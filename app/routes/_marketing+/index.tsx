@@ -8,7 +8,7 @@ import {
 import { cn } from '#app/utils/misc.tsx'
 import { logos } from './logos/logos.ts'
 
-export const meta: MetaFunction = () => [{ title: 'Ga-Ga HMS' }]
+export const meta: MetaFunction = () => [{ title: 'Ga Ga HMS' }]
 
 // Tailwind Grid cell classes lookup
 const columnClasses: Record<(typeof logos)[number]['column'], string> = {

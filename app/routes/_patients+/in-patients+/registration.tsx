@@ -6,9 +6,7 @@ import {
 } from '#app/components/forms'
 import { Spacer } from '#app/components/spacer.tsx'
 import { StatusButton } from '#app/components/ui/status-button'
-import { handle } from '#app/routes/settings+/profile.js'
 import { getUserInfo } from '#app/utils/auth.server.js'
-import { prisma } from '#app/utils/db.server.js'
 import { checkHoneypot } from '#app/utils/honeypot.server'
 import { getDefaultFromToDates, useIsPending } from '#app/utils/misc'
 import { createInPatientInfo } from '#app/utils/patients.server.js'
@@ -34,7 +32,7 @@ import {
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import { invariantResponse } from '@epic-web/invariant'
 import { type ActionFunctionArgs, json } from '@remix-run/node'
-import { Form, useSearchParams } from '@remix-run/react'
+import { Form } from '@remix-run/react'
 import { HoneypotInputs } from 'remix-utils/honeypot/react'
 import { z } from 'zod'
 import { fakerEN_IN as faker } from '@faker-js/faker'
@@ -43,13 +41,13 @@ import { redirectWithToast } from '#app/utils/toast.server.js'
 const defaultValue = {
 	name: faker.person.firstName(),
 	fatherName: faker.person.firstName(),
-	// dob: faker.date.birthdate({
-	// 	refDate: '23-12-1993',
-	// 	min: 10,
-	// 	max: 90,
-	// 	mode: 'age',
-	// }),
-	dob: '2000-02-22',
+	dob: new Date(
+		new Date().setDate(
+			new Date().getDate() - faker.number.int({ min: 10000, max: 30000 }),
+		),
+	)
+		.toISOString()
+		.split('T')[0],
 	bloodGroup: faker.helpers.arrayElement([
 		'A+',
 		'B+',
@@ -60,7 +58,12 @@ const defaultValue = {
 		'O-',
 		'AB-',
 	]),
+	street: faker.location.streetAddress(),
 	town: faker.location.city(),
+	district: faker.location.city(),
+	state: faker.location.state(),
+	zip: faker.location.zipCode(),
+	country: 'India',
 	gender: faker.helpers.arrayElement(['M', 'F']),
 	aadhar: faker.string.numeric({
 		length: 12,
@@ -71,8 +74,6 @@ const defaultValue = {
 		length: 10,
 		allowLeadingZeros: false,
 	}),
-	district: faker.location.city(),
-	paymentType: faker.helpers.arrayElement(['Card', 'Cash', 'UPI', 'Insurance']),
 }
 
 const RegistrationFormSchema = z
@@ -86,15 +87,16 @@ const RegistrationFormSchema = z
 		bloodGroup: BloodGroupSchema,
 		email: EmailSchema.optional(),
 		redirectTo: z.string().optional(),
-		paymentType: z.string().optional(),
 	})
 	.and(AddressSchema)
 
 export async function action({ request }: ActionFunctionArgs) {
+	// TODO: Add userInfo to input field
 	const userInfo = await getUserInfo(request)
 	invariantResponse(userInfo, 'User info not found', { status: 404 })
 	const formData = await request.formData()
 	checkHoneypot(formData)
+	// TODO: make name and other for captial case of first letter
 	const submission = await parseWithZod(formData, {
 		schema: intent =>
 			RegistrationFormSchema.transform(async data => {
@@ -115,7 +117,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	if (res) {
 		const { fromDate, toDate } = getDefaultFromToDates(1)
 		return redirectWithToast(
-			`/in-patients/search?fromDate=${fromDate}&toDate=${toDate}`,
+			`/in-patients/search/date?fromDate=${fromDate}&toDate=${toDate}`,
 			{
 				type: 'success',
 				title: 'Patient created',
@@ -130,25 +132,23 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function Registration() {
 	const isPending = useIsPending()
-	const [searchParams] = useSearchParams()
-	const redirectTo = searchParams.get('redirectTo')
 
 	const [form, fields] = useForm({
 		id: 'in-patient-registration-form',
 		constraint: getZodConstraint(RegistrationFormSchema),
-		defaultValue: { ...defaultValue, redirectTo },
+		defaultValue: { ...defaultValue },
 		onValidate({ formData }) {
 			return parseWithZod(formData, { schema: RegistrationFormSchema })
 		},
 		shouldRevalidate: 'onBlur',
 	})
 	return (
-		<div className="container flex min-h-full flex-col justify-center pb-32 pt-20">
+		<div className="container flex min-h-full flex-col justify-center rounded-3xl bg-muted pb-32 pt-10">
 			<div className="max-w-2lg mx-auto w-full">
 				<div className="flex flex-col gap-3 text-center">
 					<h1 className="text-h1">Patient Registration!</h1>
 					<p className="text-body-md text-muted-foreground">
-						Please enter your details.
+						Please enter patients details below.
 					</p>
 				</div>
 				<Spacer size="xs" />
@@ -207,14 +207,36 @@ export default function Registration() {
 						/>
 						<Field
 							labelProps={{
-								htmlFor: fields.town.id,
-								children: 'Town',
+								htmlFor: fields.street.id,
+								children: 'Address Line 1',
 							}}
 							inputProps={{
-								...getInputProps(fields.town, { type: 'text' }),
-								autoComplete: 'town',
+								...getInputProps(fields.street, { type: 'text' }),
+								autoComplete: 'street',
 							}}
-							errors={fields.town.errors}
+							errors={fields.street.errors}
+						/>
+						<Field
+							labelProps={{
+								htmlFor: fields.district.id,
+								children: 'District',
+							}}
+							inputProps={{
+								...getInputProps(fields.district, { type: 'text' }),
+								autoComplete: 'district',
+							}}
+							errors={fields.district.errors}
+						/>
+						<Field
+							labelProps={{
+								htmlFor: fields.country.id,
+								children: 'Country',
+							}}
+							inputProps={{
+								...getInputProps(fields.country, { type: 'text' }),
+								autoComplete: 'district',
+							}}
+							errors={fields.country.errors}
 						/>
 					</div>
 					<div>
@@ -266,28 +288,36 @@ export default function Registration() {
 						/>
 						<Field
 							labelProps={{
-								htmlFor: fields.district.id,
-								children: 'District',
+								htmlFor: fields.town.id,
+								children: 'Town',
 							}}
 							inputProps={{
-								...getInputProps(fields.district, { type: 'text' }),
-								autoComplete: 'district',
+								...getInputProps(fields.town, { type: 'text' }),
+								autoComplete: 'town',
 							}}
-							errors={fields.district.errors}
+							errors={fields.town.errors}
 						/>
-						<DropdownField
+						<Field
 							labelProps={{
-								htmlFor: fields.paymentType.id,
-								children: 'Payment Type',
+								htmlFor: fields.state.id,
+								children: 'State',
 							}}
-							selectProps={getSelectProps(fields.paymentType)}
-							errors={fields.paymentType.errors}
-							dropDownOptions={[
-								{ value: 'Card', label: 'Card' },
-								{ value: 'Cash', label: 'Cash' },
-								{ value: 'UPI', label: 'UPI' },
-								{ value: 'Insurance', label: 'Insurance' },
-							]}
+							inputProps={{
+								...getInputProps(fields.state, { type: 'text' }),
+								autoComplete: 'state',
+							}}
+							errors={fields.state.errors}
+						/>
+						<Field
+							labelProps={{
+								htmlFor: fields.zip.id,
+								children: 'Pincode',
+							}}
+							inputProps={{
+								...getInputProps(fields.zip, { type: 'text' }),
+								autoComplete: 'zip',
+							}}
+							errors={fields.zip.errors}
 						/>
 					</div>
 

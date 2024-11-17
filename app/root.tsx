@@ -81,7 +81,7 @@ export const links: LinksFunction = () => {
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	return [
-		{ title: data ? 'HMS' : 'Error | HMS' },
+		{ title: data ? 'Ga Ga HMS' : 'Error | Ga Ga HMS' },
 		{ name: 'description', content: `Your own captain's log` },
 	]
 }
@@ -264,7 +264,7 @@ function Logo() {
 	return (
 		<Link to="/" className="group grid leading-snug">
 			<span className="font-light transition group-hover:-translate-x-1">
-				Ga-Ga HMS
+				Ga Ga HMS
 			</span>
 		</Link>
 	)

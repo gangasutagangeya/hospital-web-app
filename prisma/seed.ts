@@ -3,6 +3,8 @@ import { cleanupDb, createPassword } from '#tests/db-utils.ts'
 import { fakerEN_IN as faker } from '@faker-js/faker'
 import { Address } from '@prisma/client'
 
+// Create unique IDs for Org and Hospitals
+
 async function seed() {
 	console.log('🌱 Seeding...')
 	console.time(`🌱 Database has been seeded`)
@@ -64,9 +66,9 @@ async function seed() {
 			hospital: {
 				create: [
 					{
-						name: 'mahabharatam hospital',
+						name: 'Mahabharatam Hospital',
 						registrationNo: '989898',
-						phone: 9391576029,
+						phone: '9391576029',
 						email: 'mahabharatam@gaga.com',
 						addressId:
 							addresses[faker.number.int({ min: 1, max: addresses.length - 1 })]
@@ -75,7 +77,7 @@ async function seed() {
 							create: [
 								{
 									no: 1,
-									type: 'icu',
+									type: 'ICU',
 									available: true,
 									beds: {
 										create: [
@@ -87,7 +89,7 @@ async function seed() {
 								},
 								{
 									no: 2,
-									type: 'general',
+									type: 'General',
 									available: true,
 									beds: {
 										create: [
@@ -99,7 +101,7 @@ async function seed() {
 								},
 								{
 									no: 3,
-									type: 'vip',
+									type: 'VIP',
 									available: true,
 									beds: {
 										create: [
@@ -113,9 +115,9 @@ async function seed() {
 						},
 					},
 					{
-						name: 'ramayanam Hospital',
+						name: 'Ramayanam Hospital',
 						registrationNo: '979797',
-						phone: 9182548770,
+						phone: '9182548770',
 						email: 'ramayanam@gaga.com',
 						addressId:
 							addresses[faker.number.int({ min: 1, max: addresses.length - 1 })]
@@ -124,7 +126,7 @@ async function seed() {
 							create: [
 								{
 									no: 1,
-									type: 'icu',
+									type: 'ICU',
 									available: true,
 									beds: {
 										create: [
@@ -136,7 +138,7 @@ async function seed() {
 								},
 								{
 									no: 2,
-									type: 'general',
+									type: 'General',
 									available: true,
 									beds: {
 										create: [
@@ -148,7 +150,7 @@ async function seed() {
 								},
 								{
 									no: 3,
-									type: 'vip',
+									type: 'VIP',
 									available: true,
 									beds: {
 										create: [
@@ -315,10 +317,10 @@ async function seed() {
 			addressId:
 				addresses[faker.number.int({ min: 1, max: addresses.length - 1 })].id,
 			username: 'krishna',
-			name: 'krishna',
-			fatherName: 'vishnu',
+			name: 'Krishna',
+			fatherName: 'Vishnu',
 			aadhar: '987723222323',
-			qualification: 'ms',
+			qualification: 'MS',
 			salary: '',
 			email: 'krishna@gaga.in',
 			phone: '9391576029',
@@ -336,11 +338,11 @@ async function seed() {
 			hospitalId: mahabharatamHospital?.id,
 			addressId:
 				addresses[faker.number.int({ min: 1, max: addresses.length - 1 })].id,
-			name: 'bheeshmudu',
+			name: 'Bheeshmudu',
 			username: 'bheeshmudu',
 			fatherName: 'Santanu',
 			aadhar: '323412342343',
-			qualification: 'ms',
+			qualification: 'MS',
 			salary: '',
 			email: 'bheeshmudu@gaga.in',
 			phone: '8976565434',
@@ -358,11 +360,11 @@ async function seed() {
 			hospitalId: mahabharatamHospital?.id,
 			addressId:
 				addresses[faker.number.int({ min: 1, max: addresses.length - 1 })].id,
-			name: 'drona',
+			name: 'Drona',
 			username: 'drona',
-			fatherName: 'bharadvaja',
+			fatherName: 'Bharadvaja',
 			aadhar: '323411342343',
-			qualification: 'ms',
+			qualification: 'MS',
 			salary: '',
 			email: 'drona@gaga.in',
 			phone: '8976565432',
@@ -371,7 +373,7 @@ async function seed() {
 					name: 'hospitalOwner',
 				},
 			},
-			password: { create: createPassword('bheeshmudu') },
+			password: { create: createPassword('drona') },
 		},
 	})
 	// Dharma Raju - chiefDoctor
@@ -381,10 +383,10 @@ async function seed() {
 			addressId:
 				addresses[faker.number.int({ min: 1, max: addresses.length - 1 })].id,
 			username: 'dharamaraju',
-			name: 'dharamaraju',
-			fatherName: 'yama dharamaraju',
+			name: 'Dharamaraju',
+			fatherName: 'Yamadharamaraju',
 			aadhar: '878787878787',
-			qualification: 'phd',
+			qualification: 'PHD',
 			salary: '50000',
 			email: 'dharamaraju@gaga.in',
 			phone: '9876767676',
@@ -403,10 +405,10 @@ async function seed() {
 			addressId:
 				addresses[faker.number.int({ min: 1, max: addresses.length - 1 })].id,
 			username: 'beemudu',
-			name: 'beemudu',
-			fatherName: 'vayuvu',
+			name: 'Beemudu',
+			fatherName: 'Vayuvu',
 			aadhar: '987987987634',
-			qualification: 'ms',
+			qualification: 'MS',
 			salary: '50000',
 			email: 'beemudu@gaga.in',
 			phone: '7678767821',
@@ -425,10 +427,10 @@ async function seed() {
 			addressId:
 				addresses[faker.number.int({ min: 1, max: addresses.length - 1 })].id,
 			username: 'draupadi',
-			name: 'draupadi',
-			fatherName: 'drupada',
+			name: 'Draupadi',
+			fatherName: 'Drupada',
 			aadhar: '987981987611',
-			qualification: 'ms',
+			qualification: 'MS',
 			salary: '50000',
 			email: 'draupadi@gaga.in',
 			phone: '7678717825',
@@ -447,10 +449,10 @@ async function seed() {
 			addressId:
 				addresses[faker.number.int({ min: 1, max: addresses.length - 1 })].id,
 			username: 'karna',
-			name: 'karna',
-			fatherName: 'surya',
+			name: 'Karna',
+			fatherName: 'Surya',
 			aadhar: '981981987611',
-			qualification: 'ms',
+			qualification: 'MS',
 			salary: '50000',
 			email: 'karna@gaga.in',
 			phone: '2678717825',
@@ -469,10 +471,10 @@ async function seed() {
 			addressId:
 				addresses[faker.number.int({ min: 1, max: addresses.length - 1 })].id,
 			username: 'kripa',
-			name: 'kripa',
-			fatherName: 'sharadwan',
+			name: 'Kripa',
+			fatherName: 'Sharadwan',
 			aadhar: '281981987611',
-			qualification: 'ms',
+			qualification: 'MS',
 			salary: '50000',
 			email: 'kripa@gaga.in',
 			phone: '2678417825',
@@ -491,10 +493,10 @@ async function seed() {
 			addressId:
 				addresses[faker.number.int({ min: 1, max: addresses.length - 1 })].id,
 			username: 'amba',
-			name: 'amba',
-			fatherName: 'kashya',
+			name: 'Amba',
+			fatherName: 'Kashya',
 			aadhar: '282981987611',
-			qualification: 'ms',
+			qualification: 'MS',
 			salary: '50000',
 			email: 'amba@gaga.in',
 			phone: '2678457825',
@@ -513,8 +515,8 @@ async function seed() {
 			addressId:
 				addresses[faker.number.int({ min: 1, max: addresses.length - 1 })].id,
 			username: 'rama',
-			name: 'rama',
-			fatherName: 'dasaratha',
+			name: 'Rama',
+			fatherName: 'Dasaratha',
 			aadhar: '987723222325',
 			qualification: 'phd',
 			salary: '',
@@ -535,10 +537,10 @@ async function seed() {
 			addressId:
 				addresses[faker.number.int({ min: 1, max: addresses.length - 1 })].id,
 			username: 'sita',
-			name: 'sita',
-			fatherName: 'janaka',
+			name: 'Sita',
+			fatherName: 'Janaka',
 			aadhar: '323412942343',
-			qualification: 'phd',
+			qualification: 'PHD',
 			salary: '',
 			email: 'sita@gaga.in',
 			phone: '8971565434',
@@ -557,10 +559,10 @@ async function seed() {
 			addressId:
 				addresses[faker.number.int({ min: 1, max: addresses.length - 1 })].id,
 			username: 'lakshmana',
-			name: 'lakshmana',
-			fatherName: 'dasaratha',
+			name: 'Lakshmana',
+			fatherName: 'Dasaratha',
 			aadhar: '323411342303',
-			qualification: 'ms',
+			qualification: 'MS',
 			salary: '',
 			email: 'lakshmana@gaga.in',
 			phone: '8976565412',
@@ -579,10 +581,10 @@ async function seed() {
 			addressId:
 				addresses[faker.number.int({ min: 1, max: addresses.length - 1 })].id,
 			username: 'hanuman',
-			name: 'hanuman',
-			fatherName: 'vayu',
+			name: 'Hanuman',
+			fatherName: 'Vayu',
 			aadhar: '878787818787',
-			qualification: 'phd',
+			qualification: 'PHD',
 			salary: '50000',
 			email: 'hanuman@gaga.in',
 			phone: '9876767671',
@@ -601,10 +603,10 @@ async function seed() {
 			addressId:
 				addresses[faker.number.int({ min: 1, max: addresses.length - 1 })].id,
 			username: 'kaikeyi',
-			name: 'kaikeyi',
-			fatherName: 'ashvapathi',
+			name: 'Kaikeyi',
+			fatherName: 'Ashvapathi',
 			aadhar: '987987187634',
-			qualification: 'ms',
+			qualification: 'MS',
 			salary: '50000',
 			email: 'kaikeyi@gaga.in',
 			phone: '7678760821',
@@ -623,10 +625,10 @@ async function seed() {
 			addressId:
 				addresses[faker.number.int({ min: 1, max: addresses.length - 1 })].id,
 			username: 'bharata',
-			name: 'bharata',
-			fatherName: 'dasaratha',
+			name: 'Bharata',
+			fatherName: 'Dasaratha',
 			aadhar: '987981987011',
-			qualification: 'ms',
+			qualification: 'MS',
 			salary: '50000',
 			email: 'bharata@gaga.in',
 			phone: '7678711825',
@@ -645,10 +647,10 @@ async function seed() {
 			addressId:
 				addresses[faker.number.int({ min: 1, max: addresses.length - 1 })].id,
 			username: 'jatayu',
-			name: 'jatayu',
-			fatherName: 'aruna',
+			name: 'Jatayu',
+			fatherName: 'Aruna',
 			aadhar: '983981987611',
-			qualification: 'ms',
+			qualification: 'MS',
 			salary: '50000',
 			email: 'jatayu@gaga.in',
 			phone: '2678757825',
@@ -667,8 +669,8 @@ async function seed() {
 			addressId:
 				addresses[faker.number.int({ min: 1, max: addresses.length - 1 })].id,
 			username: 'garuda',
-			name: 'garuda',
-			fatherName: 'kashyapa',
+			name: 'Garuda',
+			fatherName: 'Kashyapa',
 			aadhar: '281981087611',
 			qualification: 'ms',
 			salary: '50000',
@@ -689,10 +691,10 @@ async function seed() {
 			addressId:
 				addresses[faker.number.int({ min: 1, max: addresses.length - 1 })].id,
 			username: 'lava',
-			name: 'lava',
-			fatherName: 'rama',
+			name: 'Lava',
+			fatherName: 'Rama',
 			aadhar: '282481987611',
-			qualification: 'ms',
+			qualification: 'MS',
 			salary: '50000',
 			email: 'lava@gaga.in',
 			phone: '2671457825',
@@ -709,28 +711,28 @@ async function seed() {
 	console.time('🛏️ Create in-patients...')
 
 	const frequencies = [
-		{ frequency: '001' },
-		{ frequency: '010' },
-		{ frequency: '100' },
-		{ frequency: '101' },
-		{ frequency: '110' },
-		{ frequency: '111' },
+		{ id: '001' },
+		{ id: '010' },
+		{ id: '100' },
+		{ id: '101' },
+		{ id: '110' },
+		{ id: '111' },
 	]
 	await prisma.drugFrequency.createMany({
 		data: frequencies,
 	})
 
 	const drugStrengths = [
-		{ strength: '1mg' },
-		{ strength: '2mg' },
-		{ strength: '3mg' },
-		{ strength: '4mg' },
-		{ strength: '5mg' },
-		{ strength: '6mg' },
-		{ strength: '7mg' },
-		{ strength: '8mg' },
-		{ strength: '9mg' },
-		{ strength: '10mg' },
+		{ id: '1mg' },
+		{ id: '2mg' },
+		{ id: '3mg' },
+		{ id: '4mg' },
+		{ id: '5mg' },
+		{ id: '6mg' },
+		{ id: '7mg' },
+		{ id: '8mg' },
+		{ id: '9mg' },
+		{ id: '10mg' },
 	]
 
 	await prisma.drugStrength.createMany({
@@ -738,23 +740,23 @@ async function seed() {
 	})
 
 	const durations = [
-		{ duration: '1 day' },
-		{ duration: '2 days' },
-		{ duration: '3 days' },
-		{ duration: '4 days' },
-		{ duration: '5 days' },
-		{ duration: '6 days' },
-		{ duration: '7 days' },
-		{ duration: '8 days' },
-		{ duration: '9 days' },
-		{ duration: '10 days' },
+		{ id: '1 day' },
+		{ id: '2 days' },
+		{ id: '3 days' },
+		{ id: '4 days' },
+		{ id: '5 days' },
+		{ id: '6 days' },
+		{ id: '7 days' },
+		{ id: '8 days' },
+		{ id: '9 days' },
+		{ id: '10 days' },
 	]
 
 	await prisma.drugDuration.createMany({
 		data: durations,
 	})
 
-	const drugTimes = [{ time: 'before' }, { time: 'after' }]
+	const drugTimes = [{ id: 'before' }, { id: 'after' }]
 
 	await prisma.drugTime.createMany({
 		data: drugTimes,
@@ -763,8 +765,12 @@ async function seed() {
 	const drugs = []
 	for (let i = 0; i < 20; i++) {
 		drugs.push({
-			name: faker.lorem.word() + i,
+			id: faker.lorem.word() + i,
 			description: faker.lorem.sentence(),
+			hospitalId: faker.helpers.arrayElement([
+				ramanayamHospital?.id || '',
+				mahabharatamHospital?.id || '',
+			]),
 		})
 	}
 
@@ -799,7 +805,6 @@ async function seed() {
 		select: { id: true, name: true, username: true },
 	})
 
-	// TODO: create UMR number to be unique
 	// Mahabharatam Hospital In Patients
 	for (let i = 0; i < 100; i++) {
 		await prisma.inPatient.create({
@@ -809,7 +814,7 @@ async function seed() {
 						addressId:
 							addresses[faker.number.int({ min: 1, max: addresses.length - 1 })]
 								.id,
-						umr: 10001 + i,
+						umr: 30001 + i,
 						name: faker.person.firstName(),
 						fatherName: faker.person.firstName(),
 						dob: String(
@@ -906,66 +911,64 @@ async function seed() {
 							},
 						},
 						dischargeDate: new Date(),
-						diagnosis: faker.lorem.sentence(),
-						finalDiagnosis: faker.lorem.sentence(),
-						complaintsOnReporting: faker.lorem.sentence(),
-						pastHistory: faker.lorem.sentence(),
-						historyOfPresentingIllness: faker.lorem.sentence(),
-						physicalFindingsOfExamination: faker.lorem.sentence(),
-						laboratoryData: faker.lorem.sentence(),
-						investigationProcedure: faker.lorem.sentence(),
-						therapeuticProcedure: faker.lorem.sentence(),
-						coursesOfTreatmentInHospital: faker.lorem.sentence(),
-						summaryOfICUStay: faker.lorem.sentence(),
-						futureAdviceOnDischarge: faker.lorem.sentence(),
+						admitDate: new Date(new Date().setDate(new Date().getDate() - 3)),
+						diagnosis: faker.lorem.paragraphs(),
+						finalDiagnosis: faker.lorem.paragraphs(),
+						complaintsOnReporting: faker.lorem.paragraphs(),
+						pastHistory: faker.lorem.paragraphs(),
+						historyOfPresentingIllness: faker.lorem.paragraphs(),
+						physicalFindingsOfExamination: faker.lorem.paragraphs(),
+						laboratoryData: faker.lorem.paragraphs(),
+						investigationProcedure: faker.lorem.paragraphs(),
+						therapeuticProcedure: faker.lorem.paragraphs(),
+						coursesOfTreatmentInHospital: faker.lorem.paragraphs(),
+						summaryOfICUStay: faker.lorem.paragraphs(),
+						futureAdviceOnDischarge: faker.lorem.paragraphs(),
 						summaryDrugInstruction: {
 							create: [
 								{
 									drug: {
 										connect: {
-											name: drugs[
+											id: drugs[
 												faker.number.int({ min: 0, max: drugs.length - 1 })
-											].name,
+											].id,
 										},
 									},
 									frequency: {
 										connect: {
-											frequency:
-												frequencies[
-													faker.number.int({
-														min: 0,
-														max: frequencies.length - 1,
-													})
-												].frequency,
+											id: frequencies[
+												faker.number.int({
+													min: 0,
+													max: frequencies.length - 1,
+												})
+											].id,
 										},
 									},
 									strength: {
 										connect: {
-											strength:
-												drugStrengths[
-													faker.number.int({
-														min: 0,
-														max: drugStrengths.length - 1,
-													})
-												].strength,
+											id: drugStrengths[
+												faker.number.int({
+													min: 0,
+													max: drugStrengths.length - 1,
+												})
+											].id,
 										},
 									},
 									duration: {
 										connect: {
-											duration:
-												durations[
-													faker.number.int({
-														min: 0,
-														max: durations.length - 1,
-													})
-												].duration,
+											id: durations[
+												faker.number.int({
+													min: 0,
+													max: durations.length - 1,
+												})
+											].id,
 										},
 									},
 									time: {
 										connect: {
-											time: drugTimes[
+											id: drugTimes[
 												faker.number.int({ min: 0, max: drugTimes.length - 1 })
-											].time,
+											].id,
 										},
 									},
 								},
@@ -997,7 +1000,6 @@ async function seed() {
 		})
 	}
 
-	// TODO: create UMR number to be unique
 	// Ramayanam Hospital In Patients
 	for (let i = 100; i < 200; i++) {
 		await prisma.inPatient.create({
@@ -1007,7 +1009,7 @@ async function seed() {
 						addressId:
 							addresses[faker.number.int({ min: 1, max: addresses.length - 1 })]
 								.id,
-						umr: 10001 + i,
+						umr: 30001 + i,
 						name: faker.person.firstName(),
 						fatherName: faker.person.firstName(),
 						dob: String(
@@ -1104,66 +1106,64 @@ async function seed() {
 							},
 						},
 						dischargeDate: new Date(),
-						diagnosis: faker.lorem.sentence(),
-						finalDiagnosis: faker.lorem.sentence(),
-						complaintsOnReporting: faker.lorem.sentence(),
-						pastHistory: faker.lorem.sentence(),
-						historyOfPresentingIllness: faker.lorem.sentence(),
-						physicalFindingsOfExamination: faker.lorem.sentence(),
-						laboratoryData: faker.lorem.sentence(),
-						investigationProcedure: faker.lorem.sentence(),
-						therapeuticProcedure: faker.lorem.sentence(),
-						coursesOfTreatmentInHospital: faker.lorem.sentence(),
-						summaryOfICUStay: faker.lorem.sentence(),
-						futureAdviceOnDischarge: faker.lorem.sentence(),
+						admitDate: new Date(new Date().setDate(new Date().getDate() - 3)),
+						diagnosis: faker.lorem.paragraphs(),
+						finalDiagnosis: faker.lorem.paragraphs(),
+						complaintsOnReporting: faker.lorem.paragraphs(),
+						pastHistory: faker.lorem.paragraphs(),
+						historyOfPresentingIllness: faker.lorem.paragraphs(),
+						physicalFindingsOfExamination: faker.lorem.paragraphs(),
+						laboratoryData: faker.lorem.paragraphs(),
+						investigationProcedure: faker.lorem.paragraphs(),
+						therapeuticProcedure: faker.lorem.paragraphs(),
+						coursesOfTreatmentInHospital: faker.lorem.paragraphs(),
+						summaryOfICUStay: faker.lorem.paragraphs(),
+						futureAdviceOnDischarge: faker.lorem.paragraphs(),
 						summaryDrugInstruction: {
 							create: [
 								{
 									drug: {
 										connect: {
-											name: drugs[
+											id: drugs[
 												faker.number.int({ min: 0, max: drugs.length - 1 })
-											].name,
+											].id,
 										},
 									},
 									frequency: {
 										connect: {
-											frequency:
-												frequencies[
-													faker.number.int({
-														min: 0,
-														max: frequencies.length - 1,
-													})
-												].frequency,
+											id: frequencies[
+												faker.number.int({
+													min: 0,
+													max: frequencies.length - 1,
+												})
+											].id,
 										},
 									},
 									strength: {
 										connect: {
-											strength:
-												drugStrengths[
-													faker.number.int({
-														min: 0,
-														max: drugStrengths.length - 1,
-													})
-												].strength,
+											id: drugStrengths[
+												faker.number.int({
+													min: 0,
+													max: drugStrengths.length - 1,
+												})
+											].id,
 										},
 									},
 									duration: {
 										connect: {
-											duration:
-												durations[
-													faker.number.int({
-														min: 0,
-														max: durations.length - 1,
-													})
-												].duration,
+											id: durations[
+												faker.number.int({
+													min: 0,
+													max: durations.length - 1,
+												})
+											].id,
 										},
 									},
 									time: {
 										connect: {
-											time: drugTimes[
+											id: drugTimes[
 												faker.number.int({ min: 0, max: drugTimes.length - 1 })
-											].time,
+											].id,
 										},
 									},
 								},
@@ -1190,6 +1190,175 @@ async function seed() {
 							},
 						},
 					},
+				},
+			},
+		})
+	}
+
+	// Mahabharatam Hospital Discharge Summary Templates
+	for (let i = 0; i < 5; i++) {
+		await prisma.dischargeSummaryTemplate.create({
+			data: {
+				docter: {
+					connect: {
+						id: mahabharatamDocters[
+							faker.number.int({
+								min: 0,
+								max: mahabharatamDocters.length - 1,
+							})
+						].id,
+					},
+				},
+				hospital: {
+					connect: {
+						id: mahabharatamHospital?.id,
+					},
+				},
+				name: faker.word.noun(),
+				diagnosis: faker.lorem.paragraphs(),
+				finalDiagnosis: faker.lorem.paragraphs(),
+				complaintsOnReporting: faker.lorem.paragraphs(),
+				pastHistory: faker.lorem.paragraphs(),
+				historyOfPresentingIllness: faker.lorem.paragraphs(),
+				physicalFindingsOfExamination: faker.lorem.paragraphs(),
+				laboratoryData: faker.lorem.paragraphs(),
+				investigationProcedure: faker.lorem.paragraphs(),
+				therapeuticProcedure: faker.lorem.paragraphs(),
+				coursesOfTreatmentInHospital: faker.lorem.paragraphs(),
+				summaryOfICUStay: faker.lorem.paragraphs(),
+				futureAdviceOnDischarge: faker.lorem.paragraphs(),
+				summaryDrugInstruction: {
+					create: [
+						{
+							drug: {
+								connect: {
+									id: drugs[faker.number.int({ min: 0, max: drugs.length - 1 })]
+										.id,
+								},
+							},
+							frequency: {
+								connect: {
+									id: frequencies[
+										faker.number.int({
+											min: 0,
+											max: frequencies.length - 1,
+										})
+									].id,
+								},
+							},
+							strength: {
+								connect: {
+									id: drugStrengths[
+										faker.number.int({
+											min: 0,
+											max: drugStrengths.length - 1,
+										})
+									].id,
+								},
+							},
+							duration: {
+								connect: {
+									id: durations[
+										faker.number.int({
+											min: 0,
+											max: durations.length - 1,
+										})
+									].id,
+								},
+							},
+							time: {
+								connect: {
+									id: drugTimes[
+										faker.number.int({ min: 0, max: drugTimes.length - 1 })
+									].id,
+								},
+							},
+						},
+					],
+				},
+			},
+		})
+	}
+	// Ramayanam Hospital Discharge Summary Templates
+	for (let i = 0; i < 7; i++) {
+		await prisma.dischargeSummaryTemplate.create({
+			data: {
+				docter: {
+					connect: {
+						id: ramanayamDocters[
+							faker.number.int({
+								min: 0,
+								max: mahabharatamDocters.length - 1,
+							})
+						].id,
+					},
+				},
+				hospital: {
+					connect: {
+						id: ramanayamHospital?.id,
+					},
+				},
+				name: faker.lorem.word(),
+				diagnosis: faker.lorem.paragraphs(),
+				finalDiagnosis: faker.lorem.paragraphs(),
+				complaintsOnReporting: faker.lorem.paragraphs(),
+				pastHistory: faker.lorem.paragraphs(),
+				historyOfPresentingIllness: faker.lorem.paragraphs(),
+				physicalFindingsOfExamination: faker.lorem.paragraphs(),
+				laboratoryData: faker.lorem.paragraphs(),
+				investigationProcedure: faker.lorem.paragraphs(),
+				therapeuticProcedure: faker.lorem.paragraphs(),
+				coursesOfTreatmentInHospital: faker.lorem.paragraphs(),
+				summaryOfICUStay: faker.lorem.paragraphs(),
+				futureAdviceOnDischarge: faker.lorem.paragraphs(),
+				summaryDrugInstruction: {
+					create: [
+						{
+							drug: {
+								connect: {
+									id: drugs[faker.number.int({ min: 0, max: drugs.length - 1 })]
+										.id,
+								},
+							},
+							frequency: {
+								connect: {
+									id: frequencies[
+										faker.number.int({
+											min: 0,
+											max: frequencies.length - 1,
+										})
+									].id,
+								},
+							},
+							strength: {
+								connect: {
+									id: drugStrengths[
+										faker.number.int({
+											min: 0,
+											max: drugStrengths.length - 1,
+										})
+									].id,
+								},
+							},
+							duration: {
+								connect: {
+									id: durations[
+										faker.number.int({
+											min: 0,
+											max: durations.length - 1,
+										})
+									].id,
+								},
+							},
+							time: {
+								connect: {
+									id: drugTimes[
+										faker.number.int({ min: 0, max: drugTimes.length - 1 })
+									].id,
+								},
+							},
+						},
+					],
 				},
 			},
 		})

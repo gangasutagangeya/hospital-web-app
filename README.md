@@ -3,13 +3,20 @@
 - Prisma format file
 
 ```sh
-npx prisma formate
+npx prisma format
 ```
 
 - To load prisma and generate DBML schema
 
 ```sh
 npm prisma generate
+```
+
+- Delete migration and delete data.db. Run below commands
+
+```sh
+npx prisma migrate dev
+
 ```
 
 - To seed again if we made anychanges
@@ -77,6 +84,22 @@ QUERY PLAN
 
 ```sh
 SELECT name from sqlite_master where type = "index";
+```
+
+- Command to add new icons
+
+```sh
+npx sly add @radix-ui/icons
+```
+
+- Command to run playwright tests
+
+```sh
+npx playwright test --ui
+
+or
+
+npm run test:e2e:dev
 ```
 
 ## TODOs

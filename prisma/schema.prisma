@@ -7,14 +7,14 @@ generator client {
   provider = "prisma-client-js"
 }
 
-generator dbml {
-  provider = "prisma-dbml-generator"
-}
+// generator dbml {
+//   provider = "prisma-dbml-generator"
+// }
 
-generator erd {
-  provider = "prisma-erd-generator"
-  theme    = "forest"
-}
+// generator erd {
+//   provider = "prisma-erd-generator"
+//   theme    = "forest"
+// }
 
 datasource db {
   provider = "sqlite"
@@ -197,7 +197,7 @@ model Hospital {
 
   registrationNo String @unique
   name           String @unique
-  phone          Int    @unique
+  phone          String @unique
   email          String @unique
 
   createdAt DateTime @default(now())
@@ -211,6 +211,7 @@ model Hospital {
   dischargeSummaryTemplate DischargeSummaryTemplate[]
 
   session Session[]
+  Drug    Drug[]
 }
 
 model Password {
@@ -261,7 +262,7 @@ model Session {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String
 
-  hospital Hospital @relation(fields: [hospitalId], references: [id])
+  hospital   Hospital @relation(fields: [hospitalId], references: [id])
   hospitalId String
 
   // non-unique foreign key
@@ -385,32 +386,34 @@ model Patient {
 }
 
 model DrugStrength {
-  strength String @id @unique
+  id String @id @unique
 
   SummaryDrugInstruction SummaryDrugInstruction[]
 }
 
 model DrugDuration {
-  duration String @id @unique
+  id String @id @unique
 
   SummaryDrugInstruction SummaryDrugInstruction[]
 }
 
 model DrugFrequency {
-  frequency String @id @unique
+  id String @id @unique
 
   SummaryDrugInstruction SummaryDrugInstruction[]
 }
 
 model DrugTime {
-  time String @id @unique
+  id String @id @unique
 
   SummaryDrugInstruction SummaryDrugInstruction[]
 }
 
 model Drug {
-  name        String  @id @unique
+  id          String   @id @unique
   description String?
+  hospital    Hospital @relation(fields: [hospitalId], references: [id])
+  hospitalId  String
 
   SummaryDrugInstruction SummaryDrugInstruction[]
 }
@@ -418,23 +421,23 @@ model Drug {
 model SummaryDrugInstruction {
   id String @id @default(cuid())
 
-  drug   Drug   @relation(fields: [drugId], references: [name])
-  drugId String
-  strength DrugStrength @relation(fields: [strengthId], references: [strength])
-  strengthId String
-  frequency DrugFrequency @relation(fields: [frequencyId], references: [frequency])
+  drug        Drug          @relation(fields: [drugId], references: [id])
+  drugId      String
+  strength    DrugStrength  @relation(fields: [strengthId], references: [id])
+  strengthId  String
+  frequency   DrugFrequency @relation(fields: [frequencyId], references: [id])
   frequencyId String
-  duration DrugDuration @relation(fields: [durationId], references: [duration])
-  durationId String
-  time DrugTime @relation(fields: [drugTimeId], references: [time])
-  drugTimeId String
+  duration    DrugDuration  @relation(fields: [durationId], references: [id])
+  durationId  String
+  time        DrugTime      @relation(fields: [drugTimeId], references: [id])
+  drugTimeId  String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  DischargeSummary           DischargeSummary?         @relation(fields: [dischargeSummaryId], references: [id])
+  dischargeSummary           DischargeSummary?         @relation(fields: [dischargeSummaryId], references: [id])
   dischargeSummaryId         String?
-  DischargeSummaryTemplate   DischargeSummaryTemplate? @relation(fields: [dischargeSummaryTemplateId], references: [id])
+  dischargeSummaryTemplate   DischargeSummaryTemplate? @relation(fields: [dischargeSummaryTemplateId], references: [id])
   dischargeSummaryTemplateId String?
 }
 
@@ -449,6 +452,7 @@ model DischargeSummary {
   inPatientId String?    @unique
 
   dischargeDate                 DateTime?
+  admitDate                     DateTime?
   diagnosis                     String?
   finalDiagnosis                String?
   complaintsOnReporting         String?
@@ -461,7 +465,7 @@ model DischargeSummary {
   coursesOfTreatmentInHospital  String?
   summaryOfICUStay              String?
   futureAdviceOnDischarge       String?
-  summaryDrugInstruction                          SummaryDrugInstruction[]
+  summaryDrugInstruction        SummaryDrugInstruction[]
   preparedBy                    User                     @relation(name: "dischargeSummaryPreparedBy", fields: [preparedById], references: [id])
   preparedById                  String
   checkedBy                     User                     @relation(name: "dischargeSummaryCheckedBy", fields: [checkedById], references: [id])
@@ -510,10 +514,11 @@ model OutPatient {
 }
 
 model DischargeSummaryTemplate {
-  id String @id @default(cuid())
+  id   String @id @default(cuid())
+  name String @unique
 
-  docter     User     @relation(fields: [docterId], references: [id])
-  docterId   String
+  docter     User     @relation(fields: [createdBy], references: [id])
+  createdBy  String
   hospital   Hospital @relation(fields: [hospitalId], references: [id])
   hospitalId String
 
@@ -528,7 +533,8 @@ model DischargeSummaryTemplate {
   coursesOfTreatmentInHospital  String?
   summaryOfICUStay              String?
   futureAdviceOnDischarge       String?
-  drug                          SummaryDrugInstruction[]
+  pastHistory                   String?
+  summaryDrugInstruction        SummaryDrugInstruction[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

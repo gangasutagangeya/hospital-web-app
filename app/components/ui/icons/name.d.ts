@@ -6,6 +6,7 @@ export type IconName =
 	| 'avatar'
 	| 'camera'
 	| 'check'
+	| 'chevron-down'
 	| 'clock'
 	| 'cross-1'
 	| 'dots-horizontal'

@@ -46,6 +46,7 @@ export function Field({
 		<div className={className}>
 			<Label htmlFor={id} {...labelProps} />
 			<Input
+				key={id}
 				id={id}
 				aria-invalid={errorId ? true : undefined}
 				aria-describedby={errorId}
@@ -76,6 +77,7 @@ export function TextareaField({
 		<div className={className}>
 			<Label htmlFor={id} {...labelProps} />
 			<Textarea
+				key={id}
 				id={id}
 				aria-invalid={errorId ? true : undefined}
 				aria-describedby={errorId}
@@ -181,11 +183,11 @@ export function DropdownField({
 				aria-describedby={errorId}
 				{...selectProps}
 			>
-				<option value="" className="">
+				<option key={id} value="" className="">
 					Select
 				</option>
-				{dropDownOptions.map(({ value, label }) => (
-					<option key={value} value={value}>
+				{dropDownOptions.map(({ value, label }, index) => (
+					<option key={`${value}${index}`} value={value}>
 						{label}
 					</option>
 				))}
